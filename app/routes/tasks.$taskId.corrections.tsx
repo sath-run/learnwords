@@ -44,7 +44,7 @@ const Carriage = ({
 } & BoxProps) => {
   let radius = 10;
   return (
-    <Box ref={innerRef} {...rest}>
+    <Box userSelect={"none"} ref={innerRef} {...rest}>
       <Text fontSize={"xl"} borderRadius={"sm"} bg={bg} py={2} width="60px">
         {children}
       </Text>

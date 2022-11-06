@@ -17,6 +17,7 @@ model Log {
   userName   String
   action     String
   question   String
+  example    String
   answer     String   @default("")
   userAgent  String
   taskNumber Int

@@ -15,7 +15,17 @@ export const loader = async ({ request }: LoaderArgs) => {
 const getLogsCSV = async () => {
   let logs = await getAllLogs();
   let rows = [
-    ["姓名", "日期", "时间", "问题编号", "问题", "操作", "回答", "设备信息"],
+    [
+      "姓名",
+      "日期",
+      "时间",
+      "问题编号",
+      "问题",
+      "提示",
+      "操作",
+      "回答",
+      "设备信息",
+    ],
   ];
   let actionMap: { [key in string]: string } = {
     correct: "正确",
@@ -30,6 +40,7 @@ const getLogsCSV = async () => {
         log.createdAt.toLocaleTimeString("zh", { timeZone: "Asia/Shanghai" }),
         log.taskNumber.toString(),
         log.question,
+        log.example,
         actionMap[log.action],
         log.answer,
         log.userAgent,

@@ -59,6 +59,7 @@ export const action = async ({ request, params }: ActionArgs) => {
     taskNumber: id,
     answer: answer ?? "",
     question: data[id].question,
+    example: data[id].example,
   });
 
   if (id === data.length - 1) {
