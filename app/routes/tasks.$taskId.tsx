@@ -24,7 +24,7 @@ import { data } from "./data.server";
 import invariant from "tiny-invariant";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  let userName = requireUserName(request);
+  let userName = await requireUserName(request);
   let { taskId } = params;
   let id = Number(taskId);
   let d = data[id];
