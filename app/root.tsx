@@ -77,7 +77,7 @@ const Document = withEmotionCache(
             />
           ))}
         </head>
-        <body>
+        <body style={{ overflow: "hidden" }}>
           {children}
           <ScrollRestoration />
           <Scripts />

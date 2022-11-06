@@ -109,7 +109,7 @@ export default function Index() {
               <Text>不确定请按</Text>
               <Button
                 borderRadius={"3xl"}
-                colorScheme={"teal"}
+                colorScheme={"yellow"}
                 mt={2}
                 p={4}
                 h="auto"
@@ -134,14 +134,14 @@ export default function Index() {
           <Box as={Center}>
             <Button
               type="submit"
-              colorScheme={"blue"}
+              colorScheme={"teal"}
               borderRadius={"full"}
               h="120px"
               w="120px"
               size="lg"
               fontSize={"2xl"}
             >
-              开始
+              开始游戏
             </Button>
           </Box>
         </Grid>

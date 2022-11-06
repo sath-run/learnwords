@@ -44,16 +44,20 @@ export const action = async ({ request, params }: ActionArgs) => {
 
   let userName = await requireUserName(request);
   let formData = await request.formData();
-  let action = formData.get("_action") as string;
-  let answer = formData.get("answer") as string;
+  let action = formData.get("_action") as string | null;
+  let answer = formData.get("answer") as string | null;
   let userAgent = request.headers.get("user-agent");
+
+  if (!action) {
+    return httpResponse.BadRequest;
+  }
 
   await AddLog({
     userName: userName,
     action: action,
     userAgent: userAgent ?? "",
     taskNumber: id,
-    answer: answer,
+    answer: answer ?? "",
     question: data[id].question,
   });
 
@@ -153,7 +157,7 @@ export default function () {
           <Box>
             <Button
               borderRadius={"3xl"}
-              colorScheme={"teal"}
+              colorScheme={"yellow"}
               mt={2}
               p={4}
               h="auto"

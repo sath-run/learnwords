@@ -7,3 +7,10 @@ export const AddLog = async (
     data: data,
   });
 };
+
+export const getAllLogs = async () => {
+  let logs = await prisma.log.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+  return logs;
+};
