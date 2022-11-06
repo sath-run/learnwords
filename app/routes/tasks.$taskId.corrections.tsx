@@ -82,7 +82,7 @@ const ConfirmModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <Form method="post">
-        <ModalOverlay bg={"whiteAlpha.500"} />
+        <ModalOverlay />
         <ModalContent bg="gray.800" color={"white"}>
           <ModalHeader fontFamily={"cursive"}>
             小朋友，请确认你的答案
@@ -182,134 +182,127 @@ export default function () {
   const isInitial = (text: string) => data.initial.indexOf(text) >= 0;
 
   return (
-    <Box
-      backgroundImage={"/bg.jpg"}
-      backgroundSize="cover"
-      backgroundPosition={"center"}
-      color="white"
+    <Container
+      display={"flex"}
+      flexDir="column"
+      justifyContent={"space-between"}
+      textAlign={"center"}
+      alignItems="center"
+      px={2}
+      py={16}
+      h="100%"
     >
       <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
-        <Container
-          display={"flex"}
-          flexDir="column"
-          justifyContent={"space-between"}
-          textAlign={"center"}
-          alignItems="center"
-          px={2}
-          py={16}
-          h="100vh"
-        >
-          <Heading color="teal.50" px={2} size={"md"} lineHeight="8">
-            你认为
-            <Text color={"yellow"} as="strong" fontWeight={"bold"}>
-              {data.example}
-            </Text>
-            不正确
-            <br />
-            请你拖一拖小火车，连成一句正确的话
-            <br />
-            你必须用上"□"里的小火车。
-            <br />
-            请注意，这些可能不够用，你可以从"○"里选出你需要的小火车
-          </Heading>
-          <Droppable droppableId="answer" direction="horizontal">
-            {(provided, snapshot) => (
-              <Flex
-                px={1}
-                py={10}
-                borderWidth={2}
-                borderRadius="md"
-                backgroundColor={
-                  snapshot.isDraggingOver ? "whiteAlpha.200" : undefined
-                }
-                w={"full"}
-                // justifyContent="center"
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                overflowX="auto"
-              >
-                {words.map((text, i) => (
-                  <Draggable key={text} draggableId={text} index={i}>
-                    {(provided, snapshot) => (
-                      <Carriage
-                        bg={isInitial(text) ? "yellow.500" : "green.500"}
-                        mx={0.5}
-                        innerRef={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        {text}
-                      </Carriage>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </Flex>
-            )}
-          </Droppable>
-
-          <Droppable
-            droppableId="alts"
-            direction="horizontal"
-            isDropDisabled={isDraggingInitial}
-          >
-            {(provided, snapshot) => (
-              <Flex
-                px={1}
-                py={16}
-                height={"188px"}
-                borderWidth={2}
-                borderRadius="50%"
-                w={"full"}
-                // justifyContent="space-evenly"
-                justifyContent="center"
-                backgroundColor={
-                  snapshot.isDraggingOver ? "whiteAlpha.200" : undefined
-                }
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-              >
-                {alts.map((text, i) => (
-                  <Draggable key={text} draggableId={text} index={i}>
-                    {(provided, snapshot) => (
-                      <Carriage
-                        bg={isInitial(text) ? "yellow.500" : "green.500"}
-                        mx={0.5}
-                        innerRef={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        {text}
-                      </Carriage>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </Flex>
-            )}
-          </Droppable>
-          <Flex justifyContent={"space-around"} w="full">
-            <Button
-              as={Link}
-              to={`/tasks/${taskId}`}
-              colorScheme={"blackAlpha"}
-              size="lg"
+        <Heading color="teal.50" px={2} size={"md"} lineHeight="8">
+          你认为
+          <Text color={"yellow"} as="strong" fontWeight={"bold"}>
+            {data.example}
+          </Text>
+          不正确
+          <br />
+          请你拖一拖小火车，连成一句正确的话
+          <br />
+          你必须用上"□"里的小火车。
+          <br />
+          请注意，这些可能不够用，你可以从"○"里选出你需要的小火车
+        </Heading>
+        <Droppable droppableId="answer" direction="horizontal">
+          {(provided, snapshot) => (
+            <Flex
+              px={1}
+              py={10}
+              borderWidth={2}
+              borderRadius="md"
+              backgroundColor={
+                snapshot.isDraggingOver ? "whiteAlpha.200" : undefined
+              }
+              w={"full"}
+              // justifyContent="center"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              overflowX="auto"
             >
-              <Icon as={ImArrowLeft} mr={2} />
-              取消
-            </Button>
-            <Button colorScheme={"blue"} size="lg" onClick={modal.onOpen}>
-              提交
-              <Icon as={ImArrowRight} ml={2} />
-            </Button>
-            <ConfirmModal
-              isOpen={modal.isOpen}
-              onClose={modal.onClose}
-              words={words}
-            />
-          </Flex>
-        </Container>
+              {words.map((text, i) => (
+                <Draggable key={text} draggableId={text} index={i}>
+                  {(provided, snapshot) => (
+                    <Carriage
+                      bg={isInitial(text) ? "yellow.500" : "green.500"}
+                      mx={0.5}
+                      innerRef={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                    >
+                      {text}
+                    </Carriage>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </Flex>
+          )}
+        </Droppable>
+
+        <Droppable
+          droppableId="alts"
+          direction="horizontal"
+          isDropDisabled={isDraggingInitial}
+        >
+          {(provided, snapshot) => (
+            <Flex
+              px={1}
+              py={16}
+              height={"188px"}
+              borderWidth={2}
+              borderRadius="50%"
+              w={"full"}
+              // justifyContent="space-evenly"
+              justifyContent="center"
+              backgroundColor={
+                snapshot.isDraggingOver ? "whiteAlpha.200" : undefined
+              }
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {alts.map((text, i) => (
+                <Draggable key={text} draggableId={text} index={i}>
+                  {(provided, snapshot) => (
+                    <Carriage
+                      bg={isInitial(text) ? "yellow.500" : "green.500"}
+                      mx={0.5}
+                      innerRef={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                    >
+                      {text}
+                    </Carriage>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </Flex>
+          )}
+        </Droppable>
+        <Flex justifyContent={"space-around"} w="full">
+          <Button
+            as={Link}
+            to={`/tasks/${taskId}`}
+            colorScheme={"blackAlpha"}
+            size="lg"
+          >
+            <Icon as={ImArrowLeft} mr={2} />
+            取消
+          </Button>
+          <Button colorScheme={"blue"} size="lg" onClick={modal.onOpen}>
+            提交
+            <Icon as={ImArrowRight} ml={2} />
+          </Button>
+          <ConfirmModal
+            isOpen={modal.isOpen}
+            onClose={modal.onClose}
+            words={words}
+          />
+        </Flex>
       </DragDropContext>
-    </Box>
+    </Container>
   );
 }

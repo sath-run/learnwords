@@ -1,5 +1,5 @@
 // root.tsx
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { withEmotionCache } from "@emotion/react";
 import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node"; // Depends on the runtime you choose
@@ -19,7 +19,8 @@ import { getUserName } from "./session.server";
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "语文学习",
-  viewport: "width=device-width,initial-scale=1",
+  viewport: "width=device-width,initial-scale=1,viewport-fit=cover",
+  "theme-color": "#63a8c7",
 });
 
 export let links: LinksFunction = () => {
@@ -77,7 +78,7 @@ const Document = withEmotionCache(
             />
           ))}
         </head>
-        <body style={{ overflow: "hidden" }}>
+        <body>
           {children}
           <ScrollRestoration />
           <Scripts />
@@ -88,10 +89,27 @@ const Document = withEmotionCache(
   }
 );
 
+const theme = extendTheme({
+  styles: {
+    global: {
+      html: {
+        height: "100%",
+      },
+      // styles for the `body`
+      body: {
+        bg: "url(/bg.jpg) no-repeat center center fixed",
+        color: "white",
+        height: "100%",
+        overflow: "hidden",
+      },
+    },
+  },
+});
+
 export default function App() {
   return (
     <Document>
-      <ChakraProvider>
+      <ChakraProvider theme={theme}>
         <Outlet />
       </ChakraProvider>
     </Document>

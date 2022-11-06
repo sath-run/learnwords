@@ -5,34 +5,27 @@ import { getAllLogs } from "~/models/log.server";
 
 export default function () {
   return (
-    <Box
-      backgroundImage={"/bg.jpg"}
-      backgroundSize="cover"
-      backgroundPosition={"center"}
-      color="white"
+    <Container
+      display={"flex"}
+      flexDir="column"
+      justifyContent={"center"}
+      alignItems="center"
+      px={0}
+      py={16}
+      h="100%"
     >
-      <Container
-        display={"flex"}
-        flexDir="column"
-        justifyContent={"center"}
-        alignItems="center"
-        px={0}
-        py={16}
-        h="100vh"
-      >
-        <Center>
-          <Button
-            as={Link}
-            isExternal
-            href="/export/download"
-            colorScheme={"teal"}
-            size={"lg"}
-            p={12}
-          >
-            导出数据
-          </Button>
-        </Center>
-      </Container>
-    </Box>
+      <Center>
+        <Button
+          as={Link}
+          isExternal
+          href="/export/download"
+          colorScheme={"teal"}
+          size={"lg"}
+          p={12}
+        >
+          导出数据
+        </Button>
+      </Center>
+    </Container>
   );
 }

@@ -73,104 +73,103 @@ export default function () {
   let { taskId } = useParams();
   invariant(taskId);
   return (
-    <Box
-      backgroundImage={"/bg.jpg"}
-      backgroundSize="cover"
-      backgroundPosition={"center"}
-      color="white"
+    <Container
+      display={"flex"}
+      flexDir="column"
+      justifyContent={"space-between"}
+      textAlign={"center"}
+      alignItems="center"
+      px={0}
+      py={16}
+      h="100%"
     >
-      <Container
-        display={"flex"}
-        flexDir="column"
-        justifyContent={"space-between"}
-        textAlign={"center"}
-        alignItems="center"
-        px={0}
-        py={16}
-        h="100vh"
-      >
-        <Heading fontFamily={"cursive"} mb={4}>
-          {data.question}
+      <Heading fontFamily={"cursive"} mb={4}>
+        {data.question}
+      </Heading>
+      <Flex>
+        <video width="100%" height={"auto"} controls autoPlay loop>
+          <source src={data.videoUrl} type="video/mp4" />
+        </video>
+      </Flex>
+      <Box>
+        <Heading size="md" mb={4}>
+          请根据视频判断以下句子是否正确
         </Heading>
-        <Flex>
-          <video width="100%" height={"auto"} controls autoPlay loop>
-            <source src={data.videoUrl} type="video/mp4" />
-          </video>
-        </Flex>
+        <Text
+          fontSize={"3xl"}
+          py={6}
+          borderWidth={2}
+          borderRadius="3xl"
+          borderColor={"yellow"}
+          w={"360px"}
+          maxW="full"
+          letterSpacing="12px"
+          color={"yellow"}
+        >
+          {data.example}
+        </Text>
+      </Box>
+      <Flex
+        fontSize={"lg"}
+        textAlign={"center"}
+        justifyContent={"space-between"}
+        px={4}
+        w="360px"
+        color={"blue.500"}
+        as={Form}
+        method="post"
+      >
         <Box>
-          <Heading size="md" mb={4}>
-            请根据视频判断以下句子是否正确
-          </Heading>
-          <Text
-            fontSize={"3xl"}
-            py={6}
-            borderWidth={2}
-            borderRadius="3xl"
-            borderColor={"yellow"}
-            w={"360px"}
-            maxW="full"
-            letterSpacing="12px"
-            color={"yellow"}
+          <Button
+            borderRadius={"3xl"}
+            colorScheme={"green"}
+            mt={2}
+            p={4}
+            h="auto"
+            type="submit"
+            name="_action"
+            value="correct"
           >
-            {data.example}
+            <Icon w={8} h={8} as={FiCheck} />
+          </Button>
+          <Text mt={0.5} background={"whiteAlpha.700"} borderRadius="md">
+            正确
           </Text>
         </Box>
-        <Flex
-          fontSize={"lg"}
-          textAlign={"center"}
-          justifyContent={"space-between"}
-          px={4}
-          w="360px"
-          color={"blue.500"}
-          as={Form}
-          method="post"
-        >
-          <Box>
-            <Button
-              borderRadius={"3xl"}
-              colorScheme={"green"}
-              mt={2}
-              p={4}
-              h="auto"
-              type="submit"
-              name="_action"
-              value="correct"
-            >
-              <Icon w={8} h={8} as={FiCheck} />
-            </Button>
-            <Text>正确</Text>
-          </Box>
-          <Box>
-            <Button
-              borderRadius={"3xl"}
-              colorScheme={"red"}
-              mt={2}
-              p={4}
-              h="auto"
-              as={RemixLink}
-              to={`/tasks/${taskId}/corrections`}
-            >
-              <Icon w={8} h={8} as={FiX} />
-            </Button>
-            <Text>错误</Text>
-          </Box>
-          <Box>
-            <Button
-              borderRadius={"3xl"}
-              colorScheme={"yellow"}
-              mt={2}
-              p={4}
-              h="auto"
-              type="submit"
-              name="_action"
-              value="unsure"
-            >
-              <Icon w={8} h={8} as={BsQuestion} />
-            </Button>
-            <Text>不确定</Text>
-          </Box>
-        </Flex>
-      </Container>
-    </Box>
+        <Box>
+          <Button
+            borderRadius={"3xl"}
+            colorScheme={"red"}
+            mt={2}
+            p={4}
+            h="auto"
+            as={RemixLink}
+            to={`/tasks/${taskId}/corrections`}
+          >
+            <Icon w={8} h={8} as={FiX} />
+          </Button>
+          <Text mt={0.5} background={"whiteAlpha.700"} borderRadius="md">
+            错误
+          </Text>
+        </Box>
+        <Box>
+          <Button
+            borderRadius={"3xl"}
+            colorScheme={"yellow"}
+            mt={2}
+            p={4}
+            h="auto"
+            type="submit"
+            name="_action"
+            value="unsure"
+          >
+            <Icon w={8} h={8} as={BsQuestion} />
+          </Button>
+          <Text mt={0.5} background={"whiteAlpha.700"} borderRadius="md">
+            不确定
+          </Text>
+        </Box>
+      </Flex>
+    </Container>
   );
 }
