@@ -28,7 +28,7 @@ Now you'll need to pick a host to deploy it to.
 
 ## Tech Stacks
 
-- **Web Basic:** HTML, CSS, JavaScript
+- **Web Basic:** [HTML, CSS, JavaScript](https://www.w3schools.com/html/default.asp)
 - **JavaScript Advanced:** ES6, TypeScript, [React](https://reactjs.org/)
 - **Web Basic:** HTTP, RestFul, JSON
 - **Web Framework:** [Remix](https://remix.run/docs/en/v1), [Chakar-UI](https://chakra-ui.com/), [react-beautiful-dnd](https://github.com/atlassian/react-beautiful-dnd)
