@@ -36,6 +36,3 @@ Now you'll need to pick a host to deploy it to.
 - **Database ORM:** [Prisma](https://www.prisma.io/)
 - **Dev Tools:** Git, NPM / Yarn, Bash
 
-## Deading List:
-
-- https://www.w3schools.com/html/default.asp
