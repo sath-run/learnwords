@@ -31,7 +31,7 @@ export const loader = async ({ request }: ActionArgs) => {
   return json({
     assignment: assignmentList.map(assignment => ({
       ...assignment,
-      url: `${origin}/tasks/${assignment.id}`
+      url: `${origin}/assignment/${assignment.id}`
     }))
   });
 };
