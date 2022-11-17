@@ -51,7 +51,6 @@ import React, {
 } from "react";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { validationError } from "remix-validated-form";
-import invariant from "tiny-invariant";
 import z from "zod";
 import { httpResponse } from "~/http";
 import {
@@ -170,8 +169,7 @@ type TaskModel = {
 const Assignment: React.FC = () => {
   const { tasks } = useLoaderData<typeof loader>();
   const matches = useMatches();
-  const assignmentList = matches[1].data.assignment as Array<Assignment>;
-  invariant(assignmentList);
+  const assignmentList = matches[1].data.assignments as Array<Assignment>;
   const taskNewModal = useDisclosure();
   const fetcher = useFetcher();
   const [action, setAction] = useState(Action.NEW_TASK);
