@@ -1,6 +1,8 @@
 import { LoaderArgs } from "@remix-run/node";
+import sanitize from "sanitize-filename";
 import { number } from "zod";
 import { httpResponse } from "~/http";
+import { getAssignmentById } from "~/models/assignment.server";
 import { getAllLogs } from "~/models/log.server";
 
 export const loader = async ({ params }: LoaderArgs) => {
@@ -11,11 +13,16 @@ export const loader = async ({ params }: LoaderArgs) => {
   if (!number) {
     return httpResponse.BadRequest;
   }
+  let assignment = await getAssignmentById(assignmentId);
+  if (!assignment) {
+    return httpResponse.NotFound;
+  }
   let csvContent = await getLogsCSV(assignmentId);
   let response = new Response(csvContent);
+  let filename = sanitize(assignment.name) || "导出";
   response.headers.set(
     "Content-Disposition",
-    `attachment; filename="export.csv"`
+    `attachment; filename="${filename}.csv"`
   );
   response.headers.set("Content-type", "text/csv;charset=utf-8");
   return response;
@@ -28,7 +35,7 @@ const getLogsCSV = async (assignmentId: number) => {
       "姓名",
       "日期",
       "时间",
-      "问题编号",
+      "作业",
       "问题",
       "提示",
       "操作",
@@ -47,7 +54,7 @@ const getLogsCSV = async (assignmentId: number) => {
         log.userName,
         log.createdAt.toLocaleDateString("zh", { timeZone: "Asia/Shanghai" }),
         log.createdAt.toLocaleTimeString("zh", { timeZone: "Asia/Shanghai" }),
-        log.taskId?.toString() ?? "",
+        log.assignment.name,
         log.question,
         log.example,
         actionMap[log.action],

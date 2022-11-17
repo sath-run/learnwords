@@ -13,6 +13,13 @@ export const getAllLogs = async (assignmentId: number) => {
     where: {
       assignmentId,
     },
+    include: {
+      assignment: {
+        select: {
+          name: true,
+        },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
   return logs;

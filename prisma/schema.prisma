@@ -11,18 +11,19 @@ datasource db {
 }
 
 model Log {
-  id           Int      @id @default(autoincrement())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id           Int        @id @default(autoincrement())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
   userName     String
   action       String
   question     String
   example      String
-  answer       String   @default("")
+  answer       String     @default("")
   userAgent    String
   taskId       Int
   assignmentId Int
-  task         Task     @relation(fields: [taskId], references: [id])
+  task         Task       @relation(fields: [taskId], references: [id])
+  assignment   Assignment @relation(fields: [assignmentId], references: [id])
 }
 
 model Assignment {
@@ -32,6 +33,7 @@ model Assignment {
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
   tasks     Task[]
+  Log       Log[]
 }
 
 model Task {

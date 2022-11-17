@@ -38,3 +38,11 @@ export const getAllAssignment = async () => {
     orderBy: { createdAt: "desc" },
   });
 };
+
+export const getAssignmentById = async (id: number) => {
+  return await prisma.assignment.findFirst({
+    where: {
+      id: id,
+    },
+  });
+};
