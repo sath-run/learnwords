@@ -28,7 +28,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { FocusableElement } from "@chakra-ui/utils";
-import { Assignment } from "@prisma/client";
+import { Assignment as PrismaAssignment } from "@prisma/client";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
 import React, { RefObject, useEffect, useRef, useState } from "react";
@@ -36,6 +36,8 @@ import { FiCopy, FiEdit, FiShare, FiTrash2 } from "react-icons/fi";
 import z from "zod";
 import { Action, loader } from "~/routes/admin";
 import { FormCancelButton, FormInput, FormModal, FormSubmitButton } from "~/ui";
+
+type Assignment = Omit<PrismaAssignment, "createdAt" | "updatedAt">;
 
 const Assignment = () => {
   const { assignments, origin: initialOrigin } = useLoaderData<typeof loader>();

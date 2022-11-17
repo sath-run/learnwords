@@ -148,7 +148,7 @@ const newTaskAction = async (assignmentId: number, formData: FormData) => {
 const getUploadFile = async (formData: FormData) => {
   const result = client.signatureUrl(`${formData.get("fileName")}`, {
     method: "PUT",
-    "Content-Type": "multipart/form-data",
+    "Content-Type": "video/mp4",
   });
   return json({
     success: true,
@@ -430,7 +430,10 @@ const NewTaskModal = ({
     <FormModal
       id={"newTaskForm"}
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={() => {
+        setVideoUrl("");
+        onClose();
+      }}
       validator={newTaskValidator}
       replace
       method="post"
@@ -503,7 +506,12 @@ const NewTaskModal = ({
             value={videoUrl}
           >
             <Box>
-              {videoUrl && <video width={200} src={videoUrl} controls />}
+              {videoUrl && (
+                <Link href={videoUrl} isExternal>
+                  点击查看
+                </Link>
+              )}
+
               <Button
                 isLoading={uploading}
                 mt={2}
