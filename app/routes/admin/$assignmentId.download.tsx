@@ -66,6 +66,10 @@ const getLogsCSV = async (assignmentId: number) => {
   );
   let csvContent = "\ufeff";
 
+  const escape = (text: string) =>
+    text.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,");
+
+  rows = rows.map((fields) => fields.map(escape));
   rows.forEach(function (rowArray) {
     let row = rowArray.join(",");
     csvContent += row + "\r\n";
