@@ -430,8 +430,10 @@ const NewTaskModal = ({
     <FormModal
       id={"newTaskForm"}
       isOpen={isOpen}
-      onClose={() => {
-        setVideoUrl("");
+      onClose={({ success }) => {
+        if (success) {
+          setVideoUrl("");
+        }
         onClose();
       }}
       validator={newTaskValidator}

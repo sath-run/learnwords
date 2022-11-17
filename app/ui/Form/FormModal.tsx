@@ -1,17 +1,13 @@
 import { Modal, ModalProps } from "@chakra-ui/react";
 import { useFetcher } from "@remix-run/react";
 import { useEffect } from "react";
-import {
-  FormProps,
-  useIsSubmitting,
-  ValidatedForm,
-} from "remix-validated-form";
+import { FormProps, ValidatedForm } from "remix-validated-form";
 
 export type FormModalProps<DataType> = Omit<
   ModalProps & FormProps<DataType>,
   "fetcher" | "onClose"
 > & {
-  onClose: (data?: any) => void;
+  onClose: (data: { success: boolean; data?: any }) => void;
 };
 
 export default function FormModal<DataType>({
@@ -38,13 +34,18 @@ export default function FormModal<DataType>({
   const close = () => {
     if (fetcher.state === "idle") {
       fetcher.data = undefined;
-      onClose();
+      onClose({
+        success: false,
+      });
     }
   };
   useEffect(() => {
     if (fetcher.type === "done") {
       if (!fetcher.data?.fieldErrors) {
-        onClose(fetcher.data);
+        onClose({
+          success: true,
+          data: fetcher.data,
+        });
       }
     }
   }, [fetcher.type]);
