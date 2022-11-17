@@ -153,6 +153,7 @@ const Assignment = () => {
                     <Button
                       colorScheme={"green"}
                       mr={5}
+                      size="sm"
                       onClick={() => {
                         currentData.current = assignment;
                         assignmentNewModal.onOpen();
@@ -164,6 +165,7 @@ const Assignment = () => {
                   </Tooltip>
                   <Tooltip label="删除作业">
                     <Button
+                      size="sm"
                       colorScheme={"red"}
                       onClick={() => {
                         setDeleteDialogVisible(true);
