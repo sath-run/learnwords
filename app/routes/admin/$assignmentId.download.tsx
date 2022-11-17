@@ -20,6 +20,7 @@ export const loader = async ({ params }: LoaderArgs) => {
   let csvContent = await getLogsCSV(assignmentId);
   let response = new Response(csvContent);
   let filename = sanitize(assignment.name) || "导出";
+  filename = encodeURIComponent(filename);
   response.headers.set(
     "Content-Disposition",
     `attachment; filename="${filename}.csv"`
