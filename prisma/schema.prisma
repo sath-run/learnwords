@@ -20,9 +20,9 @@ model Log {
   example      String
   answer       String   @default("")
   userAgent    String
-  taskId       Int?
-  assignmentId Int?
-  task         Task?    @relation(fields: [taskId], references: [id])
+  taskId       Int
+  assignmentId Int
+  task         Task     @relation(fields: [taskId], references: [id])
 }
 
 model Assignment {
@@ -35,16 +35,16 @@ model Assignment {
 }
 
 model Task {
-  id           Int         @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   videoUrl     String
   question     String
   example      String
   initial      String[]
   alternative  String[]
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  isDeleted    Boolean     @default(false)
-  assignmentId Int?
-  assignment   Assignment? @relation(fields: [assignmentId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  isDeleted    Boolean    @default(false)
+  assignmentId Int
+  assignment   Assignment @relation(fields: [assignmentId], references: [id])
   logs         Log[]
 }
