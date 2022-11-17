@@ -17,10 +17,9 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { Form, Link, useMatches, useParams } from '@remix-run/react';
+import { ActionArgs, redirect } from "@remix-run/node";
+import { Form, Link, useMatches, useParams } from "@remix-run/react";
 import { ReactNode, useState } from "react";
-import { ImArrowRight, ImArrowLeft } from "react-icons/im";
-import invariant from "tiny-invariant";
 import {
   DragDropContext,
   Draggable,
@@ -29,35 +28,48 @@ import {
   DropResult,
   ResponderProvided,
 } from "react-beautiful-dnd";
-import { ActionArgs, redirect } from '@remix-run/node';
-import { getAllTasks } from '~/models/task.server';
-import { httpResponse } from '~/http';
-import { requireUserName } from '~/session.server';
-import { AddLog } from '~/models/log.server';
-
+import { ImArrowLeft, ImArrowRight } from "react-icons/im";
+import invariant from "tiny-invariant";
+import { httpResponse } from "~/http";
+import { AddLog } from "~/models/log.server";
+import { getAssignmentWithTasks } from "~/models/task.server";
+import { requireUserName } from "~/session.server";
 
 export const action = async ({ request, params }: ActionArgs) => {
-  let { index, assignmentId } = params;
+  let { index } = params;
+  let assignmentId = Number(params.assignmentId);
+
+  if (!assignmentId) {
+    return httpResponse.BadRequest;
+  }
+
   const taskIndex = Number(index);
-  const taskList = await getAllTasks(assignmentId);
+  const assignment = await getAssignmentWithTasks(assignmentId);
+
+  if (!assignment) {
+    return httpResponse.BadRequest;
+  }
+
+  let taskList = assignment.tasks;
+
   if (taskIndex < 0 || taskIndex >= taskList.length) {
     return httpResponse.BadRequest;
   }
   let userName = await requireUserName(request);
   let formData = await request.formData();
-  let action = formData.get('_action') as string | null;
-  let answer = formData.get('answer') as string | null;
-  let userAgent = request.headers.get('user-agent');
+  let action = formData.get("_action") as string | null;
+  let answer = formData.get("answer") as string | null;
+  let userAgent = request.headers.get("user-agent");
   if (!action) {
     return httpResponse.BadRequest;
   }
   await AddLog({
     userName: userName,
     action: action,
-    userAgent: userAgent ?? '',
+    userAgent: userAgent ?? "",
     taskId: taskList[taskIndex].id,
     assignmentId: assignmentId,
-    answer: answer ?? '',
+    answer: answer ?? "",
     question: taskList[taskIndex].question,
     example: taskList[taskIndex].example,
   });

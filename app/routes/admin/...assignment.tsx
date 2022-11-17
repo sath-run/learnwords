@@ -7,12 +7,15 @@ import {
   AlertDialogOverlay,
   Button,
   Flex,
+  Icon,
+  Link,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  ModalOverlay, Spacer,
+  ModalOverlay,
+  Spacer,
   Table,
   TableContainer,
   Tbody,
@@ -21,21 +24,24 @@ import {
   Thead,
   Tooltip,
   Tr,
-  useDisclosure, useToast
-} from '@chakra-ui/react';
-import { useFetcher, useLoaderData } from '@remix-run/react';
-import invariant from 'tiny-invariant';
-import { Assignment } from '@prisma/client';
-import { FiEdit, FiShare, FiTrash2 } from 'react-icons/fi';
-import { FormCancelButton, FormInput, FormModal, FormSubmitButton } from '~/ui';
-import { withZod } from '@remix-validated-form/with-zod';
-import z from 'zod';
-import React, { RefObject, useEffect, useRef, useState } from 'react';
-import { FocusableElement } from '@chakra-ui/utils';
-import { Action } from '~/routes/admin';
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
+import { FocusableElement } from "@chakra-ui/utils";
+import { Assignment } from "@prisma/client";
+import { useFetcher, useLoaderData } from "@remix-run/react";
+import { withZod } from "@remix-validated-form/with-zod";
+import React, { RefObject, useEffect, useRef, useState } from "react";
+import { FiCopy, FiEdit, FiShare, FiTrash2 } from "react-icons/fi";
+import invariant from "tiny-invariant";
+import z from "zod";
+import { Action } from "~/routes/admin";
+import { FormCancelButton, FormInput, FormModal, FormSubmitButton } from "~/ui";
 
 const Assignment = () => {
-  const assignmentList = useLoaderData().assignment as unknown as Array<Assignment & { url: string }>;
+  const assignmentList = useLoaderData().assignment as unknown as Array<
+    Assignment & { url: string }
+  >;
   invariant(assignmentList);
   const assignmentNewModal = useDisclosure();
   const fetcher = useFetcher();
@@ -44,7 +50,7 @@ const Assignment = () => {
   const currentData = useRef<Assignment>();
   const toast = useToast();
   useEffect(() => {
-    if (fetcher.type === 'done') {
+    if (fetcher.type === "done") {
       setDeleteDialogVisible(false);
     }
   }, [fetcher.type]);
@@ -53,80 +59,130 @@ const Assignment = () => {
     setAction(Action.NEW_ASSIGNMENT);
     assignmentNewModal.onOpen();
   };
-  const isLoading = fetcher.state !== 'idle';
+  const isLoading = fetcher.state !== "idle";
   const onDelete = () => {
     fetcher.submit(
       {
-        id: currentData.current!.id,
+        id: currentData.current!.id.toString(),
         _action: Action.DELETE_ASSIGNMENT,
       },
       {
-        method: 'patch',
+        method: "patch",
         replace: true,
       }
     );
   };
   const onCopy = (text: string) => {
-    const input = document.createElement('input');
+    const input = document.createElement("input");
     document.body.appendChild(input);
     input.value = text;
     input.select();
-    document.execCommand('copy');
+    document.execCommand("copy");
     input.remove();
     toast({
-      title: '复制成功',
-      status: 'success',
-      position: 'top',
+      title: "复制成功",
+      status: "success",
+      position: "top",
       isClosable: true,
     });
   };
-  const onExport = (id: string) => {
-    window.open(`/admin/${id}/download`, '_black');
+  const onExport = (id: number) => {
+    window.open(`/admin/${id}/download`, "_black");
   };
-  return (<>
-    <Flex>
-      <Spacer />
-      <Button colorScheme={'blue'} onClick={onAdd}>新建作业</Button>
-    </Flex>
-    <TableContainer mt={4}>
-      <Table variant="simple" width={'100%'}>
-        <Thead>
-          <Tr>
-            <Th fontSize={16}>序号</Th>
-            <Th fontSize={16}>作业名称</Th>
-            <Th fontSize={16}>作业链接</Th>
-            <Th fontSize={16}>更多操作</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {assignmentList.map((assignment, index) => (<Tr key={assignment.id}>
-            <Td align={'center'}>{index + 1}</Td>
-            <Td>
-              {assignment.name}
-            </Td>
-            <Td >
-              {assignment.url}
-              <Button colorScheme="teal" variant="ghost" onClick={() => onCopy(assignment.url)}>复制</Button>
-            </Td>
-            <Td>
-              <Tooltip label='导出答案'><Button mr={5}  colorScheme={'green'} onClick={() => onExport(assignment.id)}><FiShare /></Button></Tooltip>
-              <Tooltip label='编辑'><Button colorScheme={'green'} mr={5} onClick={() => {
-                currentData.current = assignment;
-                assignmentNewModal.onOpen();
-                setAction(Action.UPDATE_ASSIGNMENT);
-              }}><FiEdit /></Button></Tooltip>
-              <Tooltip label='删除作业'><Button colorScheme={'red'} onClick={() => {
-                setDeleteDialogVisible(true);
-                currentData.current = assignment;
-              }}><FiTrash2 /></Button></Tooltip>
-            </Td>
-          </Tr>))}
-        </Tbody>
-      </Table>
-    </TableContainer>
-    <NewAssignmentModal {...assignmentNewModal} action={action} defaultValue={currentData.current} />
-    <DeleteDialog isLoading={isLoading} isOpen={deleteDialogVisible} onClose={() => setDeleteDialogVisible(false)} onDelete={onDelete} />
-  </>);
+  return (
+    <>
+      <Flex>
+        <Spacer />
+        <Button colorScheme={"blue"} onClick={onAdd}>
+          新建作业
+        </Button>
+      </Flex>
+      <TableContainer mt={4}>
+        <Table variant="simple" width={"100%"}>
+          <Thead>
+            <Tr>
+              <Th fontSize={16}>序号</Th>
+              <Th fontSize={16}>作业名称</Th>
+              <Th fontSize={16}>作业链接</Th>
+              <Th fontSize={16} isNumeric>
+                更多操作
+              </Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {assignmentList.map((assignment, index) => (
+              <Tr key={assignment.id}>
+                <Td align={"center"}>{index + 1}</Td>
+                <Td>{assignment.name}</Td>
+                <Td>
+                  <Link isExternal href={assignment.url}>
+                    {assignment.url}
+                  </Link>
+                  <Button
+                    colorScheme="teal"
+                    variant="ghost"
+                    onClick={() => onCopy(assignment.url)}
+                    size="sm"
+                  >
+                    <Icon as={FiCopy} />
+                  </Button>
+                </Td>
+                <Td isNumeric>
+                  <Tooltip label="导出回答">
+                    <Button
+                      size="sm"
+                      mr={5}
+                      colorScheme={"green"}
+                      onClick={() => onExport(assignment.id)}
+                    >
+                      <FiShare />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip label="编辑">
+                    <Button
+                      size="sm"
+                      colorScheme={"green"}
+                      mr={5}
+                      onClick={() => {
+                        currentData.current = assignment;
+                        assignmentNewModal.onOpen();
+                        setAction(Action.UPDATE_ASSIGNMENT);
+                      }}
+                    >
+                      <FiEdit />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip label="删除作业">
+                    <Button
+                      size="sm"
+                      colorScheme={"red"}
+                      onClick={() => {
+                        setDeleteDialogVisible(true);
+                        currentData.current = assignment;
+                      }}
+                    >
+                      <FiTrash2 />
+                    </Button>
+                  </Tooltip>
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
+      <NewAssignmentModal
+        {...assignmentNewModal}
+        action={action}
+        defaultValue={currentData.current}
+      />
+      <DeleteDialog
+        isLoading={isLoading}
+        isOpen={deleteDialogVisible}
+        onClose={() => setDeleteDialogVisible(false)}
+        onDelete={onDelete}
+      />
+    </>
+  );
 };
 
 const DeleteDialog: React.FC<{
@@ -136,35 +192,43 @@ const DeleteDialog: React.FC<{
   isLoading: boolean;
 }> = ({ isOpen, onClose, onDelete, isLoading }) => {
   const cancelRef = useRef<FocusableElement>();
-  return <AlertDialog
-    isOpen={isOpen}
-    onClose={onClose}
-    leastDestructiveRef={cancelRef as RefObject<FocusableElement>}
-  >
-    <AlertDialogOverlay>
-      <AlertDialogContent>
-        <AlertDialogHeader fontSize="lg" fontWeight="bold">
-          确认删除
-        </AlertDialogHeader>
-        <AlertDialogBody>
-          确定删除吗？删除后不能恢复
-        </AlertDialogBody>
-        <AlertDialogFooter>
-          <Button ref={cancelRef as RefObject<HTMLButtonElement>} onClick={onClose}>
-            取消
-          </Button>
-          <Button isLoading={isLoading} colorScheme="red" ml={3} onClick={onDelete}>
-            删除
-          </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialogOverlay>
-  </AlertDialog>;
+  return (
+    <AlertDialog
+      isOpen={isOpen}
+      onClose={onClose}
+      leastDestructiveRef={cancelRef as RefObject<FocusableElement>}
+    >
+      <AlertDialogOverlay>
+        <AlertDialogContent>
+          <AlertDialogHeader fontSize="lg" fontWeight="bold">
+            确认删除
+          </AlertDialogHeader>
+          <AlertDialogBody>确定删除吗？删除后不能恢复</AlertDialogBody>
+          <AlertDialogFooter>
+            <Button
+              ref={cancelRef as RefObject<HTMLButtonElement>}
+              onClick={onClose}
+            >
+              取消
+            </Button>
+            <Button
+              isLoading={isLoading}
+              colorScheme="red"
+              ml={3}
+              onClick={onDelete}
+            >
+              删除
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialogOverlay>
+    </AlertDialog>
+  );
 };
 
 export const newAssignmentValidator = withZod(
   z.object({
-    name: z.string().min(1, '请填写作业名称'),
+    name: z.string().min(1, "请填写作业名称"),
   })
 );
 
@@ -172,7 +236,7 @@ const NewAssignmentModal = ({
   isOpen,
   onClose,
   action,
-  defaultValue = {} as Assignment
+  defaultValue = {} as Assignment,
 }: {
   isOpen: boolean;
   onClose: (data?: any) => void;
@@ -188,15 +252,17 @@ const NewAssignmentModal = ({
       method="post"
       size="lg"
       resetAfterSubmit={true}
-      action={'/admin'}
+      action={"/admin"}
     >
       <ModalOverlay />
 
       <ModalContent>
-        <ModalHeader>{action === Action.NEW_ASSIGNMENT ? '新增作业' : '修改作业'}</ModalHeader>
+        <ModalHeader>
+          {action === Action.NEW_ASSIGNMENT ? "新增作业" : "修改作业"}
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          <FormInput type={'hidden'} name={'id'} value={defaultValue.id} />
+          <FormInput type={"hidden"} name={"id"} value={defaultValue.id} />
           <FormInput
             name="name"
             label="作业名称"

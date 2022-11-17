@@ -1,148 +1,59 @@
 import {
-  Box,
   Button,
-  Center,
   Container,
-  Flex,
   Grid,
   Heading,
-  Icon,
-  Input,
-  Text,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
 
-import { FiCheck, FiX } from "react-icons/fi";
-import { BsQuestion } from "react-icons/bs";
-import { Form } from "@remix-run/react";
-import { ActionArgs, json, redirect } from "@remix-run/node";
+import { json, LoaderArgs } from "@remix-run/node";
+import { Link as RemixLink, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import { httpResponse } from "~/http";
-import { createUserSession } from "~/session.server";
-import { getAllAssignment } from '~/models/assignment.server';
+import { getAllAssignment } from "~/models/assignment.server";
 
-export const action = async ({ request }: ActionArgs) => {
-  let formData = await request.formData();
-  let name = formData.get("name") as string;
-  if (!name) {
-    return httpResponse.BadRequest;
-  }
+export const loader = async ({ request }: LoaderArgs) => {
   const assignmentList = await getAllAssignment();
-  if(!assignmentList.length){
-    return httpResponse.BadRequest;
+  if (!assignmentList.length) {
+    throw httpResponse.BadRequest;
   }
-  return createUserSession({
-    request,
-    userName: name,
-    remember: true,
-    redirectTo: `/assignment/${assignmentList[0].id}/tasks/0`,
+  return json({
+    assignmentList,
   });
 };
 
 export default function Index() {
   const [name, setName] = useState("");
   const toast = useToast();
+  let { assignmentList } = useLoaderData<typeof loader>();
   return (
     <Container h="100%">
-      <Grid
-        h="100%"
-        as={Form}
-        method="post"
-        py={10}
-        templateRows="80px 1fr 1fr 1fr 120px"
-        onSubmit={(e) => {
-          let nameValue = name.trim();
-          if (!nameValue) {
-            e.preventDefault();
-            toast({
-              title: "小朋友，请输入你的姓名",
-              status: "error",
-              duration: 5000,
-              position: "top",
-              isClosable: true,
-            });
-          }
-        }}
-      >
-        <Heading fontFamily={"cursive"} textAlign={"center"}>
-          小朋友你好
-          <br />
-          我们来玩一个小游戏吧！
+      <Grid h="100%" templateRows="100px 1fr">
+        <Heading mt={6} textAlign={"center"}>
+          小朋友，请选择作业
         </Heading>
-        <Heading px={4} textAlign="center" as={Center} size="lg">
-          你会看到几个视频
-          <br />
-          请根据视频判断句子是否正确
-        </Heading>
-        <Flex
-          fontSize={"lg"}
-          textAlign={"center"}
-          justifyContent={"space-between"}
-          px={4}
+        <VStack
+          borderRadius={"lg"}
+          p={4}
+          bg={"whiteAlpha.500"}
+          overflow-y={"auto"}
+          spacing={"8"}
         >
-          <Box>
-            <Text>正确请按</Text>
+          {assignmentList.map((assignment) => (
             <Button
-              borderRadius={"3xl"}
-              colorScheme={"green"}
-              mt={2}
-              p={4}
-              h="auto"
+              py={8}
+              size={"lg"}
+              w="full"
+              colorScheme={"teal"}
+              key={assignment.id}
+              as={RemixLink}
+              to={`/assignment/${assignment.id}/start`}
             >
-              <Icon w={8} h={8} as={FiCheck} />
+              {assignment.name}
             </Button>
-          </Box>
-          <Box>
-            <Text>错误请按</Text>
-            <Button
-              borderRadius={"3xl"}
-              colorScheme={"red"}
-              mt={2}
-              p={4}
-              h="auto"
-            >
-              <Icon w={8} h={8} as={FiX} />
-            </Button>
-          </Box>
-          <Box>
-            <Text>不确定请按</Text>
-            <Button
-              borderRadius={"3xl"}
-              colorScheme={"yellow"}
-              mt={2}
-              p={4}
-              h="auto"
-            >
-              <Icon w={8} h={8} as={BsQuestion} />
-            </Button>
-          </Box>
-        </Flex>
-        <Center>
-          <Input
-            color={"black"}
-            name="name"
-            isRequired
-            maxW={"96"}
-            size="lg"
-            bg={"white"}
-            placeholder="请输入你的姓名"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </Center>
-        <Box as={Center}>
-          <Button
-            type="submit"
-            colorScheme={"teal"}
-            borderRadius={"full"}
-            h="120px"
-            w="120px"
-            size="lg"
-            fontSize={"2xl"}
-          >
-            开始游戏
-          </Button>
-        </Box>
+          ))}
+        </VStack>
       </Grid>
     </Container>
   );

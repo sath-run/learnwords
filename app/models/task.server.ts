@@ -1,30 +1,21 @@
-import { prisma } from './prisma.server';
+import { prisma } from "./prisma.server";
 
-export const addTask = async (assignmentId: string, data: {
+export const addTask = async (data: {
   videoUrl: string;
   question: string;
   example: string;
   initial: string[];
   alternative: string[];
+  assignmentId: number;
 }) => {
-  const assignment = await prisma.assignment.findFirst({where: {id: assignmentId}});
-  if (!assignment) {
-    return false;
-  }
   const result = await prisma.task.create({
     data,
-  });
-  await prisma.assignment.update({
-    where: { id: assignmentId },
-    data: {
-      taskIds: assignment.taskIds.concat(result.id)
-    }
   });
   return result;
 };
 
 export const updateTask = async (
-  id: string,
+  id: number,
   data: {
     videoUrl: string;
     question: string;
@@ -35,45 +26,34 @@ export const updateTask = async (
 ) => {
   return prisma.task.update({
     where: {
-      id
+      id,
     },
-    data: data
+    data: data,
   });
 };
 
-export const deleteTask = async (
-  assignmentId: string,
-  id: string
-) => {
+export const deleteTask = async (id: number) => {
   return prisma.task.update({
     where: {
-      id
+      id,
     },
     data: {
-      isDeleted: true
-    }
+      isDeleted: true,
+    },
   });
 };
 
-export const getAllTasks = async (assignmentId: string | undefined) => {
-  if (!assignmentId) {
-    return [];
-  }
+export const getAssignmentWithTasks = async (assignmentId: number) => {
   const assignment = await prisma.assignment.findFirst({
     where: {
       id: assignmentId,
-    }
-  })
-  if (!assignment) {
-    return [];
-  }
-  return await prisma.task.findMany({
-    where: {
-      id: {
-        in: assignment.taskIds
-      },
-      isDeleted: false
     },
-    orderBy: { createdAt: 'asc' },
+    select: {
+      id: true,
+      name: true,
+      tasks: true,
+    },
   });
+
+  return assignment;
 };

@@ -11,36 +11,40 @@ datasource db {
 }
 
 model Log {
-  id         String   @id @default(dbgenerated("gen_random_uuid()"))
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  userName   String
-  action     String
-  question   String
-  example    String
-  answer     String   @default("")
-  userAgent  String
-  taskId     String   @default("")
-  assignmentId     String  @default("")
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  userName     String
+  action       String
+  question     String
+  example      String
+  answer       String   @default("")
+  userAgent    String
+  taskId       Int?
+  assignmentId Int?
+  task         Task?    @relation(fields: [taskId], references: [id])
 }
 
 model Assignment {
-  id        String    @id @default(dbgenerated("gen_random_uuid()"))
-  name      String    @default("")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  isDeleted Boolean   @default(false)
-  taskIds   String[]
+  id        Int      @id @default(autoincrement())
+  name      String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+  tasks     Task[]
 }
 
 model Task {
-  id          String  @id @default(dbgenerated("gen_random_uuid()"))
-  videoUrl    String
-  question    String
-  example     String
-  initial     String[]
-  alternative String[]
-  createdAt   DateTime @default(now())
-  isDeleted   Boolean   @default(false)
-  updatedAt   DateTime @updatedAt
+  id           Int         @id @default(autoincrement())
+  videoUrl     String
+  question     String
+  example      String
+  initial      String[]
+  alternative  String[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  isDeleted    Boolean     @default(false)
+  assignmentId Int?
+  assignment   Assignment? @relation(fields: [assignmentId], references: [id])
+  logs         Log[]
 }

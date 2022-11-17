@@ -1,8 +1,6 @@
 import { prisma } from "./prisma.server";
 
-export const addAssignment = async (
-  name: string
-) => {
+export const addAssignment = async (name: string) => {
   return prisma.assignment.create({
     data: {
       name,
@@ -10,39 +8,32 @@ export const addAssignment = async (
   });
 };
 
-export const updateAssignment = async (
-  id: string,
-  name: string
-) => {
+export const updateAssignment = async (id: number, name: string) => {
   return prisma.assignment.update({
     where: {
-      id
+      id,
     },
     data: {
-      name
-    }
+      name,
+    },
   });
 };
 
-
-export const deleteAssignment = async (
-  id: string
-) => {
+export const deleteAssignment = async (id: number) => {
   return prisma.assignment.update({
     where: {
-      id
+      id,
     },
     data: {
-      isDeleted: true
-    }
+      isDeleted: true,
+    },
   });
 };
-
 
 export const getAllAssignment = async () => {
   return await prisma.assignment.findMany({
     where: {
-      isDeleted: false
+      isDeleted: false,
     },
     orderBy: { createdAt: "desc" },
   });
