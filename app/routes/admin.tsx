@@ -9,7 +9,6 @@ import {
   Tabs,
   useToast,
 } from "@chakra-ui/react";
-import { Assignment } from "@prisma/client";
 import { ActionArgs, json, redirect } from "@remix-run/node";
 import {
   Link,
@@ -21,7 +20,6 @@ import {
 import { withZod } from "@remix-validated-form/with-zod";
 import { useEffect } from "react";
 import { validationError } from "remix-validated-form";
-import invariant from "tiny-invariant";
 import z from "zod";
 import { httpResponse } from "~/http";
 import {
@@ -36,10 +34,10 @@ export const loader = async ({ request }: ActionArgs) => {
   const origin = new URL(request.url).origin;
   const assignmentList = await getAllAssignment();
   return json({
-    assignment: assignmentList.map((assignment) => ({
+    assignments: assignmentList.map((assignment) => ({
       ...assignment,
-      url: `${origin}/assignment/${assignment.id}/start`,
     })),
+    origin: origin,
   });
 };
 
@@ -106,10 +104,7 @@ export default function Admin() {
   const transition = useTransition();
   const toast = useToast();
   const location = useLocation();
-  const assignmentList = useLoaderData().assignment as Array<
-    Assignment & { url: string }
-  >;
-  invariant(assignmentList);
+  const { assignments } = useLoaderData<typeof loader>();
   useEffect(() => {
     if (
       transition.state === "loading" &&
@@ -142,9 +137,7 @@ export default function Admin() {
               </Tab>
               <Tab>
                 <Link
-                  to={`/admin/${
-                    assignmentList[0] ? assignmentList[0].id : "task"
-                  }`}
+                  to={`/admin/${assignments[0] ? assignments[0].id : "task"}`}
                 >
                   任务管理
                 </Link>

@@ -33,22 +33,26 @@ import { useFetcher, useLoaderData } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
 import React, { RefObject, useEffect, useRef, useState } from "react";
 import { FiCopy, FiEdit, FiShare, FiTrash2 } from "react-icons/fi";
-import invariant from "tiny-invariant";
 import z from "zod";
-import { Action } from "~/routes/admin";
+import { Action, loader } from "~/routes/admin";
 import { FormCancelButton, FormInput, FormModal, FormSubmitButton } from "~/ui";
 
 const Assignment = () => {
-  const assignmentList = useLoaderData().assignment as unknown as Array<
-    Assignment & { url: string }
-  >;
-  invariant(assignmentList);
+  const { assignments, origin: initialOrigin } = useLoaderData<typeof loader>();
   const assignmentNewModal = useDisclosure();
   const fetcher = useFetcher();
   const [action, setAction] = useState(Action.NEW_ASSIGNMENT);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const currentData = useRef<Assignment>();
   const toast = useToast();
+
+  let [origin, setOrigin] = useState(initialOrigin);
+
+  useEffect(() => {
+    let urlobj = new URL(window.location.href);
+    setOrigin(urlobj.origin);
+  }, []);
+
   useEffect(() => {
     if (fetcher.type === "done") {
       setDeleteDialogVisible(false);
@@ -110,25 +114,30 @@ const Assignment = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {assignmentList.map((assignment, index) => (
+            {assignments.map((assignment, index) => (
               <Tr key={assignment.id}>
                 <Td align={"center"}>{index + 1}</Td>
                 <Td>{assignment.name}</Td>
                 <Td>
-                  <Link isExternal href={assignment.url}>
-                    {assignment.url}
+                  <Link
+                    isExternal
+                    href={`${origin}/assignment/${assignment.id}/start`}
+                  >
+                    {`${origin}/assignment/${assignment.id}/start`}
                   </Link>
                   <Button
                     colorScheme="teal"
                     variant="ghost"
-                    onClick={() => onCopy(assignment.url)}
+                    onClick={() =>
+                      onCopy(`${origin}/assignment/${assignment.id}/start`)
+                    }
                     size="sm"
                   >
                     <Icon as={FiCopy} />
                   </Button>
                 </Td>
                 <Td isNumeric>
-                  <Tooltip label="导出回答">
+                  <Tooltip label="导出答案">
                     <Button
                       size="sm"
                       mr={5}
@@ -140,7 +149,6 @@ const Assignment = () => {
                   </Tooltip>
                   <Tooltip label="编辑">
                     <Button
-                      size="sm"
                       colorScheme={"green"}
                       mr={5}
                       onClick={() => {
@@ -154,7 +162,6 @@ const Assignment = () => {
                   </Tooltip>
                   <Tooltip label="删除作业">
                     <Button
-                      size="sm"
                       colorScheme={"red"}
                       onClick={() => {
                         setDeleteDialogVisible(true);
