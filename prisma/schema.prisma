@@ -20,7 +20,8 @@ model Log {
   example    String
   answer     String   @default("")
   userAgent  String
-  taskNumber Int
+  taskId     String   @default("")
+  assignmentId     String  @default("")
 }
 
 model Assignment {
@@ -29,7 +30,7 @@ model Assignment {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   isDeleted Boolean   @default(false)
-  taskIds   Int[]
+  taskIds   String[]
 }
 
 model Task {
@@ -40,5 +41,6 @@ model Task {
   initial     String[]
   alternative String[]
   createdAt   DateTime @default(now())
+  isDeleted   Boolean   @default(false)
   updatedAt   DateTime @updatedAt
 }

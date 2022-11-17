@@ -17,9 +17,8 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { Form, Link, useLoaderData, useParams } from "@remix-run/react";
+import { Form, Link, useMatches, useParams } from '@remix-run/react';
 import { ReactNode, useState } from "react";
-import { loader, action } from "./tasks.$taskId";
 import { ImArrowRight, ImArrowLeft } from "react-icons/im";
 import invariant from "tiny-invariant";
 import {
@@ -30,8 +29,45 @@ import {
   DropResult,
   ResponderProvided,
 } from "react-beautiful-dnd";
+import { ActionArgs, redirect } from '@remix-run/node';
+import { getAllTasks } from '~/models/task.server';
+import { httpResponse } from '~/http';
+import { requireUserName } from '~/session.server';
+import { AddLog } from '~/models/log.server';
 
-export { loader, action };
+
+export const action = async ({ request, params }: ActionArgs) => {
+  let { index, assignmentId } = params;
+  const taskIndex = Number(index);
+  const taskList = await getAllTasks(assignmentId);
+  if (taskIndex < 0 || taskIndex >= taskList.length) {
+    return httpResponse.BadRequest;
+  }
+  let userName = await requireUserName(request);
+  let formData = await request.formData();
+  let action = formData.get('_action') as string | null;
+  let answer = formData.get('answer') as string | null;
+  let userAgent = request.headers.get('user-agent');
+  if (!action) {
+    return httpResponse.BadRequest;
+  }
+  await AddLog({
+    userName: userName,
+    action: action,
+    userAgent: userAgent ?? '',
+    taskId: taskList[taskIndex].id,
+    assignmentId: assignmentId,
+    answer: answer ?? '',
+    question: taskList[taskIndex].question,
+    example: taskList[taskIndex].example,
+  });
+
+  if (taskIndex === taskList.length - 1) {
+    return redirect(`/assignment/${assignmentId}/finish`);
+  } else {
+    return redirect(`/assignment/${assignmentId}/tasks/${taskIndex + 1}`);
+  }
+};
 
 const Carriage = ({
   children,
@@ -124,13 +160,15 @@ const ConfirmModal = ({
 };
 
 export default function () {
-  let data = useLoaderData<typeof loader>();
-  let { taskId } = useParams();
-  let [words, setWords] = useState(data.initial);
-  let [alts, setAlts] = useState(data.alternative);
+  const { index, assignmentId } = useParams();
+  invariant(index);
+  const data = useMatches()[1].data.taskList[index];
+  invariant(data);
+  let [words, setWords] = useState<string[]>(data.initial);
+  let [alts, setAlts] = useState<string[]>(data.alternative);
   let [isDraggingInitial, setIsDraggingInitial] = useState(false);
   let modal = useDisclosure();
-  invariant(taskId);
+  invariant(index);
 
   const onDragStart = (initial: DragStart, provided: ResponderProvided) => {
     if (initial.source.droppableId === "answer") {
@@ -142,7 +180,7 @@ export default function () {
   const onDragEnd = (result: DropResult, provided: ResponderProvided) => {
     setIsDraggingInitial(false);
 
-    const { draggableId, source, destination } = result;
+    const { source, destination } = result;
     if (!destination) {
       return;
     }
@@ -285,7 +323,7 @@ export default function () {
         <Flex justifyContent={"space-around"} w="full">
           <Button
             as={Link}
-            to={`/tasks/${taskId}`}
+            to={`/assignment/${assignmentId}/tasks/${index}`}
             colorScheme={"blackAlpha"}
             size="lg"
           >

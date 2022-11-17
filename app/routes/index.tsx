@@ -19,6 +19,7 @@ import { ActionArgs, json, redirect } from "@remix-run/node";
 import { useState } from "react";
 import { httpResponse } from "~/http";
 import { createUserSession } from "~/session.server";
+import { getAllAssignment } from '~/models/assignment.server';
 
 export const action = async ({ request }: ActionArgs) => {
   let formData = await request.formData();
@@ -26,11 +27,15 @@ export const action = async ({ request }: ActionArgs) => {
   if (!name) {
     return httpResponse.BadRequest;
   }
+  const assignmentList = await getAllAssignment();
+  if(!assignmentList.length){
+    return httpResponse.BadRequest;
+  }
   return createUserSession({
     request,
     userName: name,
     remember: true,
-    redirectTo: "/tasks/0",
+    redirectTo: `/assignment/${assignmentList[0].id}/tasks/0`,
   });
 };
 

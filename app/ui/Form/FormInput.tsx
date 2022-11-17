@@ -19,7 +19,7 @@ export interface FormInputProps
   extends InputProps,
     Pick<React.HTMLProps<HTMLButtonElement>, "autoComplete"> {
   name: string;
-  label?: string;
+  label?: string | React.ReactNode;
   container?: FormControlProps;
   formId?: string;
 }

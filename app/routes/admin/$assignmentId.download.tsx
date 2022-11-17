@@ -1,8 +1,12 @@
 import { LoaderArgs } from "@remix-run/node";
 import { getAllLogs } from "~/models/log.server";
+import { httpResponse } from '~/http';
 
-export const loader = async ({ request }: LoaderArgs) => {
-  let csvContent = await getLogsCSV();
+export const loader = async ({ params }: LoaderArgs) => {
+  if(!params.assignmentId){
+    return httpResponse.NotFound;
+  }
+  let csvContent = await getLogsCSV(params.assignmentId);
   let response = new Response(csvContent);
   response.headers.set(
     "Content-Disposition",
@@ -12,8 +16,8 @@ export const loader = async ({ request }: LoaderArgs) => {
   return response;
 };
 
-const getLogsCSV = async () => {
-  let logs = await getAllLogs();
+const getLogsCSV = async (assignmentId: string) => {
+  let logs = await getAllLogs(assignmentId);
   let rows = [
     [
       "姓名",
@@ -38,7 +42,7 @@ const getLogsCSV = async () => {
         log.userName,
         log.createdAt.toLocaleDateString("zh", { timeZone: "Asia/Shanghai" }),
         log.createdAt.toLocaleTimeString("zh", { timeZone: "Asia/Shanghai" }),
-        log.taskNumber.toString(),
+        log.taskId.toString(),
         log.question,
         log.example,
         actionMap[log.action],

@@ -12,32 +12,30 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  ModalOverlay,
-  Spacer,
+  ModalOverlay, Spacer,
   Table,
   TableContainer,
   Tbody,
   Td,
   Th,
   Thead,
+  Tooltip,
   Tr,
   useDisclosure, useToast
 } from '@chakra-ui/react';
-import { useFetcher, useMatches } from '@remix-run/react';
+import { useFetcher, useLoaderData } from '@remix-run/react';
 import invariant from 'tiny-invariant';
 import { Assignment } from '@prisma/client';
-import { FiEdit, FiTrash2 } from 'react-icons/fi';
-import dayjs from 'dayjs';
+import { FiEdit, FiShare, FiTrash2 } from 'react-icons/fi';
 import { FormCancelButton, FormInput, FormModal, FormSubmitButton } from '~/ui';
 import { withZod } from '@remix-validated-form/with-zod';
 import z from 'zod';
 import React, { RefObject, useEffect, useRef, useState } from 'react';
-import { Action } from '~/routes/admin';
 import { FocusableElement } from '@chakra-ui/utils';
+import { Action } from '~/routes/admin';
 
 const Assignment = () => {
-  const matches = useMatches();
-  const assignmentList = matches[1].data.assignment as Array<Assignment & {url: string}>;
+  const assignmentList = useLoaderData().assignment as unknown as Array<Assignment & { url: string }>;
   invariant(assignmentList);
   const assignmentNewModal = useDisclosure();
   const fetcher = useFetcher();
@@ -45,7 +43,13 @@ const Assignment = () => {
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const currentData = useRef<Assignment>();
   const toast = useToast();
+  useEffect(() => {
+    if (fetcher.type === 'done') {
+      setDeleteDialogVisible(false);
+    }
+  }, [fetcher.type]);
   const onAdd = () => {
+    currentData.current = {} as unknown as Assignment;
     setAction(Action.NEW_ASSIGNMENT);
     assignmentNewModal.onOpen();
   };
@@ -75,56 +79,52 @@ const Assignment = () => {
       position: 'top',
       isClosable: true,
     });
-  }
-  useEffect(() => {
-    if (fetcher.type === "done") {
-      setDeleteDialogVisible(false);
-    }
-  }, [fetcher.type]);
+  };
+  const onExport = (id: string) => {
+    window.open(`/admin/${id}/download`, '_black');
+  };
   return (<>
     <Flex>
       <Spacer />
       <Button colorScheme={'blue'} onClick={onAdd}>新建作业</Button>
     </Flex>
     <TableContainer mt={4}>
-      <Table variant="simple">
+      <Table variant="simple" width={'100%'}>
         <Thead>
           <Tr>
             <Th fontSize={16}>序号</Th>
             <Th fontSize={16}>作业名称</Th>
-            <Th fontSize={16}>修改时间</Th>
             <Th fontSize={16}>作业链接</Th>
             <Th fontSize={16}>更多操作</Th>
           </Tr>
         </Thead>
         <Tbody>
-          {assignmentList.map((assignment,index) => (<Tr key={assignment.id}>
+          {assignmentList.map((assignment, index) => (<Tr key={assignment.id}>
             <Td align={'center'}>{index + 1}</Td>
             <Td>
               {assignment.name}
             </Td>
-            <Td>
-              {dayjs(assignment.updatedAt).format('YYYY-MM-DD HH:mm:ss')}
+            <Td >
+              {assignment.url}
+              <Button colorScheme="teal" variant="ghost" onClick={() => onCopy(assignment.url)}>复制</Button>
             </Td>
             <Td>
-              {assignment.url} <Button colorScheme='teal' variant='ghost' onClick={() => onCopy(assignment.url)}>复制</Button>
-            </Td>
-            <Td>
-              <Button colorScheme={'green'} mr={5} onClick={() => {
+              <Tooltip label='导出答案'><Button mr={5}  colorScheme={'green'} onClick={() => onExport(assignment.id)}><FiShare /></Button></Tooltip>
+              <Tooltip label='编辑'><Button colorScheme={'green'} mr={5} onClick={() => {
                 currentData.current = assignment;
                 assignmentNewModal.onOpen();
                 setAction(Action.UPDATE_ASSIGNMENT);
-              }}><FiEdit /></Button>
-              <Button colorScheme={'red'} onClick={() => {
+              }}><FiEdit /></Button></Tooltip>
+              <Tooltip label='删除作业'><Button colorScheme={'red'} onClick={() => {
                 setDeleteDialogVisible(true);
                 currentData.current = assignment;
-              }}><FiTrash2 /></Button>
+              }}><FiTrash2 /></Button></Tooltip>
             </Td>
           </Tr>))}
         </Tbody>
       </Table>
     </TableContainer>
-    <NewAssignmentModal {...assignmentNewModal} action={action} defaultValue={currentData.current}/>
+    <NewAssignmentModal {...assignmentNewModal} action={action} defaultValue={currentData.current} />
     <DeleteDialog isLoading={isLoading} isOpen={deleteDialogVisible} onClose={() => setDeleteDialogVisible(false)} onDelete={onDelete} />
   </>);
 };
@@ -187,7 +187,8 @@ const NewAssignmentModal = ({
       replace
       method="post"
       size="lg"
-      action={"/admin"}
+      resetAfterSubmit={true}
+      action={'/admin'}
     >
       <ModalOverlay />
 
@@ -195,7 +196,7 @@ const NewAssignmentModal = ({
         <ModalHeader>{action === Action.NEW_ASSIGNMENT ? '新增作业' : '修改作业'}</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          <FormInput type={"hidden"} name={"id"} value={defaultValue.id}/>
+          <FormInput type={'hidden'} name={'id'} value={defaultValue.id} />
           <FormInput
             name="name"
             label="作业名称"

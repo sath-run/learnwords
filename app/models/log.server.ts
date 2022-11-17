@@ -8,8 +8,11 @@ export const AddLog = async (
   });
 };
 
-export const getAllLogs = async () => {
+export const getAllLogs = async (assignmentId: string) => {
   let logs = await prisma.log.findMany({
+    where: {
+      assignmentId
+    },
     orderBy: { createdAt: "desc" },
   });
   return logs;

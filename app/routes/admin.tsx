@@ -5,25 +5,29 @@ import {
   Divider,
   Heading,
   TabList,
-  TabPanel,
-  TabPanels,
   Tab,
-  Tabs, useToast,
+  Tabs,
+  TabPanels,
+  TabPanel, useToast,
 } from '@chakra-ui/react';
+import { Link, Outlet, useLoaderData, useLocation, useTransition } from '@remix-run/react';
 import { ActionArgs, json, redirect } from '@remix-run/node';
-import Task from '~/routes/...task';
-import Assignment, { newAssignmentValidator } from '~/routes/...assignment';
 import {
   addAssignment,
   deleteAssignment,
-  getAllAssignment, updateAssignment
+  getAllAssignment,
+  updateAssignment
 } from '~/models/assignment.server';
-import { validationError } from 'remix-validated-form';
+import { Assignment } from '@prisma/client';
 import { httpResponse } from '~/http';
-import { useEffect } from 'react';
-import { useTransition } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import z from 'zod';
+import { validationError } from 'remix-validated-form';
+import { useEffect } from 'react';
+import invariant from 'tiny-invariant';
+import AssignmentList, { newAssignmentValidator } from './admin/...assignment';
+
+
 
 export const loader = async ({ request }: ActionArgs) => {
   const origin = new URL(request.url).origin;
@@ -31,7 +35,7 @@ export const loader = async ({ request }: ActionArgs) => {
   return json({
     assignment: assignmentList.map(assignment => ({
       ...assignment,
-      url: `${origin}/assignment/${assignment.id}`
+      url: `${origin}/assignment/${assignment.id}/start`
     }))
   });
 };
@@ -40,14 +44,11 @@ export enum Action {
   NEW_ASSIGNMENT = 'NEW_ASSIGNMENT',
   UPDATE_ASSIGNMENT = 'UPDATE_ASSIGNMENT',
   DELETE_ASSIGNMENT = 'DELETE_ASSIGNMENT',
-  NEW_TASK = 'NEW_TASK',
-  UPDATE_TASK = 'UPDATE_TASK',
-  DELETE_TAsk = 'DELETE_TAsk',
 }
 
 export const action = async ({ request }: ActionArgs) => {
   let formData = await request.formData();
-  console.info(formData.get('_action'));
+  console.info('_action:', formData.get('_action'));
   switch (formData.get('_action')) {
     case Action.NEW_ASSIGNMENT:
       return await newAssignmentAction(formData);
@@ -56,7 +57,6 @@ export const action = async ({ request }: ActionArgs) => {
     case Action.DELETE_ASSIGNMENT:
       return await deleteAssignmentAction(formData);
     default:
-      console.info('_action:', formData.get('_action'));
       return httpResponse.NotFound;
   }
 };
@@ -100,11 +100,16 @@ const updateAssignmentAction = async (formData: FormData) => {
   return redirect(`/admin`);
 };
 
+
 export default function Admin() {
-  const toast = useToast();
   const transition = useTransition();
+  const toast = useToast();
+  const location = useLocation();
+  const assignmentList = useLoaderData().assignment as Array<Assignment & { url: string }>;
+  invariant(assignmentList);
   useEffect(() => {
-    if (transition.state === 'loading') {
+    console.info('transition:', transition)
+    if (transition.state === 'loading' && transition.type === 'fetchActionRedirect' && transition.location.pathname === '/admin') {
       toast({
         title: '操作成功',
         status: 'success',
@@ -112,25 +117,24 @@ export default function Admin() {
         isClosable: true,
       });
     }
-  }, [transition.state]);
+  }, [transition.state, transition.type]);
   return (
     <DarkMode>
-      <Box bg={'gray.900'} flexDir="column" px={0} h="full" pt="4">
+      <Box bg={'gray.900'} flexDir="column" px={0} h="full" pt="4" overflowY={'auto'}>
         <Container maxW={'8xl'}>
           <Heading>管理控制台</Heading>
           <Divider my={4} />
-
-          <Tabs mt={10}>
+          <Tabs my={10} index={location.pathname === '/admin' ? 0 : 1}>
             <TabList>
-              <Tab>作业管理</Tab>
-              <Tab>任务管理</Tab>
+              <Tab><Link to={"/admin"}>作业管理</Link></Tab>
+              <Tab><Link to={`/admin/${assignmentList[0] ? assignmentList[0].id : 'task'}`}>任务管理</Link></Tab>
             </TabList>
             <TabPanels>
               <TabPanel>
-                <Assignment />
+                <AssignmentList />
               </TabPanel>
               <TabPanel>
-                <Task />
+                <Outlet/>
               </TabPanel>
             </TabPanels>
           </Tabs>
