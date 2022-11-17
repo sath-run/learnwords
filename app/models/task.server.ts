@@ -51,7 +51,9 @@ export const getAssignmentWithTasks = async (assignmentId: number) => {
     select: {
       id: true,
       name: true,
-      tasks: true,
+      tasks: {
+        orderBy: { createdAt: "asc" },
+      },
     },
   });
 

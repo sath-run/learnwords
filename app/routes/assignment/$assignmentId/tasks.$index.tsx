@@ -7,7 +7,7 @@ import {
   Icon,
   Text,
 } from "@chakra-ui/react";
-import { ActionArgs, redirect } from "@remix-run/node";
+import { ActionArgs, redirect, SerializeFrom } from "@remix-run/node";
 import {
   Form,
   Link as RemixLink,
@@ -21,6 +21,7 @@ import { httpResponse } from "~/http";
 import { AddLog } from "~/models/log.server";
 import { getAssignmentWithTasks } from "~/models/task.server";
 import { requireUserName } from "~/session.server";
+import { loader } from "../$assignmentId";
 
 export const action = async ({ request, params }: ActionArgs) => {
   let { index } = params;
@@ -69,8 +70,8 @@ export const action = async ({ request, params }: ActionArgs) => {
 export default function () {
   const { index, assignmentId } = useParams();
   invariant(index);
-  const data = useMatches()[1].data.taskList[index];
-  invariant(data);
+  const assignment = useMatches()[1].data as SerializeFrom<typeof loader>;
+  let data = assignment.tasks[Number(index)];
   return (
     <Container
       display={"flex"}
