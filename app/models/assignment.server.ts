@@ -31,11 +31,10 @@ export const deleteAssignment = async (id: number) => {
   });
 };
 
-export const getAllAssignment = async (userId: number) => {
+export const getAllAssignment = async () => {
   return await prisma.assignment.findMany({
     where: {
       isDeleted: false,
-      userId,
     },
     orderBy: { createdAt: "desc" },
   });

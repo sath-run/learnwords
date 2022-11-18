@@ -32,9 +32,9 @@ import AssignmentList, { newAssignmentValidator } from "./admin/...assignment";
 import { getAdminUserId, requireAdminUserId } from '~/session.server';
 
 export const loader = async ({ request }: ActionArgs) => {
-  const userId = await requireAdminUserId(request);
+  await requireAdminUserId(request);
   const origin = new URL(request.url).origin;
-  const assignmentList = await getAllAssignment(Number(userId));
+  const assignmentList = await getAllAssignment();
   return json({
     assignments: assignmentList.map((assignment) => ({
       ...assignment,
