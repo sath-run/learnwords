@@ -1,20 +1,20 @@
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import {
-  Box, Button, Center,
+  Box,
+  Button,
+  Center,
   DarkMode,
   InputRightElement,
-} from '@chakra-ui/react';
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import { ActionArgs } from '@remix-run/node';
-import {
-  useTransition,
-} from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import React, { useState } from 'react';
-import { ValidatedForm, validationError } from 'remix-validated-form';
-import z from 'zod';
-import { FormInput, FormSubmitButton } from '~/ui';
-import { createAdminUserSession } from '~/session.server';
-import { verifyLogin } from '~/models/admin.server';
+} from "@chakra-ui/react";
+import { ActionArgs } from "@remix-run/node";
+import { useTransition } from "@remix-run/react";
+import { withZod } from "@remix-validated-form/with-zod";
+import { useState } from "react";
+import { ValidatedForm, validationError } from "remix-validated-form";
+import z from "zod";
+import { verifyLogin } from "~/models/admin.server";
+import { createAdminUserSession } from "~/session.server";
+import { FormInput, FormSubmitButton } from "~/ui";
 
 export const action = async ({ request }: ActionArgs) => {
   let formData = await request.formData();
@@ -22,8 +22,8 @@ export const action = async ({ request }: ActionArgs) => {
   if (result.error) {
     return validationError(result.error);
   }
-  const { email, password } = result.data;
-  const user = await verifyLogin(email, password);
+  const { username, password } = result.data;
+  const user = await verifyLogin(username, password);
   if (!user) {
     return validationError(
       { fieldErrors: { password: "账号或密码错误" } },
@@ -34,37 +34,42 @@ export const action = async ({ request }: ActionArgs) => {
   return createAdminUserSession({
     request,
     userId: user.id.toString(),
-    redirectTo: '/admin',
+    redirectTo: "/admin",
   });
 };
 
-const validator = withZod(z.object({
-  email: z.string().min(1, '请输入账号'),
-  password: z.string().min(1, '请输入密码')
-}));
+const validator = withZod(
+  z.object({
+    username: z.string().min(1, "请输入账号"),
+    password: z.string().min(1, "请输入密码"),
+  })
+);
 export default function Login() {
   const transition = useTransition();
   const [showPassword, setShowPassword] = useState(false);
-  const isLoading = transition.state !== 'idle';
+  const isLoading = transition.state !== "idle";
   return (
     <DarkMode>
-      <Box
-        bg={'gray.900'}
-        h="full"
-        w={'full'}
-      >
-        <Center h={'full'}>
-          <Box w={'500px'} mt={-100} borderWidth={1} borderColor={'gray'} p={50} borderRadius={5}>
+      <Box bg={"gray.900"} h="full" w={"full"}>
+        <Center h={"full"}>
+          <Box
+            w={"500px"}
+            mt={-100}
+            borderWidth={1}
+            borderColor={"gray"}
+            p={50}
+            borderRadius={5}
+          >
             <ValidatedForm
               validator={validator}
               disableFocusOnError={false}
               replace={true}
-              method={'post'}
-              action={'/login'}
+              method={"post"}
+              action={"/login"}
             >
               <Box pb={6}>
                 <FormInput
-                  name="email"
+                  name="username"
                   label="账号"
                   placeholder="请输入账号"
                   autoComplete="off"
@@ -75,7 +80,7 @@ export default function Login() {
                   label="密码"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder={'请输入密码'}
+                  placeholder={"请输入密码"}
                 >
                   <InputRightElement h={"full"}>
                     <Button
@@ -91,7 +96,7 @@ export default function Login() {
               </Box>
               <FormSubmitButton
                 type="submit"
-                w={'full'}
+                w={"full"}
                 isLoading={isLoading}
                 colorScheme="blue"
               >

@@ -28,8 +28,8 @@ import {
   getAllAssignment,
   updateAssignment,
 } from "~/models/assignment.server";
+import { getAdminUserId, requireAdminUserId } from "~/session.server";
 import AssignmentList, { newAssignmentValidator } from "./admin/...assignment";
-import { getAdminUserId, requireAdminUserId } from '~/session.server';
 
 export const loader = async ({ request }: ActionArgs) => {
   await requireAdminUserId(request);
@@ -54,7 +54,7 @@ export const action = async ({ request }: ActionArgs) => {
   switch (formData.get("_action")) {
     case Action.NEW_ASSIGNMENT:
       const userId = await getAdminUserId(request);
-      if(!userId){
+      if (!userId) {
         return httpResponse.Forbidden;
       }
       return await newAssignmentAction(userId, formData);

@@ -1,13 +1,13 @@
-import { User } from '@prisma/client';
-import { prisma } from './prisma.server';
-import bcrypt from 'bcryptjs';
+import { Admin } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import { prisma } from "./prisma.server";
 
 export async function verifyLogin(
-  email: User['email'],
-  password: User['password']
+  username: Admin["username"],
+  password: Admin["password"]
 ) {
-  const userWithPassword = await prisma.user.findUnique({
-    where: { email },
+  const userWithPassword = await prisma.admin.findUnique({
+    where: { username },
   });
 
   if (!userWithPassword || !userWithPassword.password) {
