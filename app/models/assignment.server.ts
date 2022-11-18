@@ -1,8 +1,9 @@
 import { prisma } from "./prisma.server";
 
-export const addAssignment = async (name: string) => {
+export const addAssignment = async (userId: number, name: string) => {
   return prisma.assignment.create({
     data: {
+      userId,
       name,
     },
   });
@@ -30,10 +31,11 @@ export const deleteAssignment = async (id: number) => {
   });
 };
 
-export const getAllAssignment = async () => {
+export const getAllAssignment = async (userId: number) => {
   return await prisma.assignment.findMany({
     where: {
       isDeleted: false,
+      userId,
     },
     orderBy: { createdAt: "desc" },
   });

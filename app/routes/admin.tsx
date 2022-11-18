@@ -29,10 +29,12 @@ import {
   updateAssignment,
 } from "~/models/assignment.server";
 import AssignmentList, { newAssignmentValidator } from "./admin/...assignment";
+import { getAdminUserId, requireAdminUserId } from '~/session.server';
 
 export const loader = async ({ request }: ActionArgs) => {
+  const userId = await requireAdminUserId(request);
   const origin = new URL(request.url).origin;
-  const assignmentList = await getAllAssignment();
+  const assignmentList = await getAllAssignment(Number(userId));
   return json({
     assignments: assignmentList.map((assignment) => ({
       ...assignment,
@@ -51,7 +53,11 @@ export const action = async ({ request }: ActionArgs) => {
   let formData = await request.formData();
   switch (formData.get("_action")) {
     case Action.NEW_ASSIGNMENT:
-      return await newAssignmentAction(formData);
+      const userId = await getAdminUserId(request);
+      if(!userId){
+        return httpResponse.Forbidden;
+      }
+      return await newAssignmentAction(userId, formData);
     case Action.UPDATE_ASSIGNMENT:
       return await updateAssignmentAction(formData);
     case Action.DELETE_ASSIGNMENT:
@@ -75,13 +81,13 @@ const deleteAssignmentAction = async (formData: FormData) => {
   return redirect(`/admin`);
 };
 
-const newAssignmentAction = async (formData: FormData) => {
+const newAssignmentAction = async (userId: string, formData: FormData) => {
   const result = await newAssignmentValidator.validate(formData);
   if (result.error) {
     return validationError(result.error);
   }
   const { name } = result.data;
-  await addAssignment(name);
+  await addAssignment(Number(userId), name);
   return redirect(`/admin`);
 };
 

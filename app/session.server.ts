@@ -15,6 +15,8 @@ export const sessionStorage = createCookieSessionStorage({
 });
 
 const USER_SESSION_KEY = "userName";
+const ADMIN_USER_SESSION_KEY = "adminUserId";
+
 
 export async function getSession(request: Request) {
   const cookie = request.headers.get("Cookie");
@@ -63,11 +65,49 @@ export async function createUserSession({
   });
 }
 
+
 export async function logout(request: Request) {
   const session = await getSession(request);
   return redirect("/", {
     headers: {
       "Set-Cookie": await sessionStorage.destroySession(session),
+    },
+  });
+}
+
+
+export async function getAdminUserId(request: Request) {
+  const session = await getSession(request);
+  const userId = session.get(ADMIN_USER_SESSION_KEY) as string | undefined;
+  return userId;
+}
+
+export async function requireAdminUserId(
+  request: Request,
+) {
+  const userId = await getAdminUserId(request);
+  if (!userId) {
+    throw redirect(`/login`);
+  }
+  return userId;
+}
+
+export async function createAdminUserSession({
+  request,
+  userId,
+  redirectTo,
+}: {
+  request: Request;
+  userId: string;
+  redirectTo: string;
+}) {
+  const session = await getSession(request);
+  session.set(ADMIN_USER_SESSION_KEY, userId);
+  return redirect(redirectTo, {
+    headers: {
+      "Set-Cookie": await sessionStorage.commitSession(session, {
+        maxAge: 60 * 60 * 24 * 365 // 365 days
+      }),
     },
   });
 }
