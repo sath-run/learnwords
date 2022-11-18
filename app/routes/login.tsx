@@ -14,7 +14,7 @@ import { ValidatedForm, validationError } from 'remix-validated-form';
 import z from 'zod';
 import { FormInput, FormSubmitButton } from '~/ui';
 import { createAdminUserSession } from '~/session.server';
-import { verifyLogin } from '~/models/user.server';
+import { verifyLogin } from '~/models/admin.server';
 
 export const action = async ({ request }: ActionArgs) => {
   let formData = await request.formData();

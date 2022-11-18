@@ -24,9 +24,3 @@ export async function verifyLogin(
 
   return userWithoutPassword;
 }
-
-export async function getUserById(id: number) {
-  return prisma.user.findFirst({
-    where: { id }
-  });
-}
