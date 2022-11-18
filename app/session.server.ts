@@ -79,7 +79,7 @@ export async function logout(request: Request) {
 export async function getAdminUserId(request: Request) {
   const session = await getSession(request);
   const userId = session.get(ADMIN_USER_SESSION_KEY) as string | undefined;
-  return userId;
+  return Number(userId);
 }
 
 export async function requireAdminUserId(
@@ -89,7 +89,7 @@ export async function requireAdminUserId(
   if (!userId) {
     throw redirect(`/login`);
   }
-  return userId;
+  return Number(userId);
 }
 
 export async function createAdminUserSession({
