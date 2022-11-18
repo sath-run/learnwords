@@ -1,5 +1,6 @@
 import {
   Button,
+  Box,
   Container,
   Grid,
   Heading,
@@ -28,9 +29,9 @@ export default function Index() {
   const toast = useToast();
   let { assignmentList } = useLoaderData<typeof loader>();
   return (
-    <Container h="100%">
-      <Grid h="100%" templateRows="100px 1fr">
-        <Heading mt={6} textAlign={"center"}>
+    <Box h="100%" overflowY="auto">
+      <Container>  
+        <Heading mt={6} mb={2} textAlign={"center"}>
           小朋友，请选择作业
         </Heading>
         <VStack
@@ -54,7 +55,7 @@ export default function Index() {
             </Button>
           ))}
         </VStack>
-      </Grid>
-    </Container>
+      </Container>
+    </Box>
   );
 }
