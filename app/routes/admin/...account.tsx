@@ -1,86 +1,69 @@
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import {
-  Box, Button, Divider,
+  Box,
+  Button,
+  Heading,
+  HStack,
   InputRightElement,
-} from '@chakra-ui/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import * as React from 'react';
-import z from 'zod';
-import { Action } from '~/routes/admin';
-import { FormInput, FormSubmitButton } from '~/ui';
-import { ValidatedForm } from 'remix-validated-form';
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
-import { useMatches, useTransition } from '@remix-run/react';
-import { useState } from 'react';
-
+  Text,
+} from "@chakra-ui/react";
+import { useMatches, useTransition } from "@remix-run/react";
+import { withZod } from "@remix-validated-form/with-zod";
+import { useState } from "react";
+import { ValidatedForm } from "remix-validated-form";
+import z from "zod";
+import { Action } from "~/routes/admin";
+import { FormInput, FormSubmitButton } from "~/ui";
 
 export const passwordValidator = withZod(
-  z.object({
-    currentPassword: z.string().min(1, '请输入当前密码'),
-    password: z.string().min(1, '请输入新密码'),
-    confirmPassword: z.string().min(1, '请输入确认密码'),
-  }).superRefine(({ confirmPassword, password }, ctx) => {
-    if (confirmPassword !== password) {
-      ctx.addIssue({
-        path: ["confirmPassword"],
-        code: "custom",
-        message: "新密码和确认密码不一致"
-      });
-    }
-  })
+  z
+    .object({
+      currentPassword: z.string().min(1, "请输入当前密码"),
+      password: z.string().min(1, "请输入新密码"),
+      confirmPassword: z.string().min(1, "请输入确认密码"),
+    })
+    .superRefine(({ confirmPassword, password }, ctx) => {
+      if (confirmPassword !== password) {
+        ctx.addIssue({
+          path: ["confirmPassword"],
+          code: "custom",
+          message: "新密码和确认密码不一致",
+        });
+      }
+    })
 );
 
 const Account = () => {
   const matches = useMatches();
   const transition = useTransition();
   const [showPassword, setShowPassword] = useState(false);
-  const isLoading = transition.state !== 'idle';
+  const isLoading = transition.state !== "idle";
   const user = matches[1].data.user;
   return (
-    <Box
-      w={'500px'}
-      py={50}
-      borderRadius={5}
-    >
+    <Box w={"500px"} py={50} borderRadius={5}>
       <ValidatedForm
         validator={passwordValidator}
         disableFocusOnError={false}
         replace={true}
-        method={'post'}
-        action={'/admin'}
+        method={"post"}
+        action={"/admin"}
       >
-        <Box pb={4}>
-          <FormInput
-            readOnly
-            name="username"
-            label="用户名"
-            placeholder="请输入账号"
-            autoComplete="off"
-            defaultValue={user.username}
-          />
-        </Box>
-        <Box pb={4}>
-          <FormInput
-            readOnly
-            name="name"
-            label="名字"
-            placeholder="请输入账号"
-            autoComplete="off"
-            defaultValue={user.name}
-          />
-        </Box>
+        <Heading pb={4} size="lg" as={HStack}>
+          <Text>{user.username}</Text>
+          <Text mx={2}>|</Text>
+          <Text>{user.name}</Text>
+        </Heading>
         <Box pb={4}>
           <FormInput
             label="当前密码"
             name="currentPassword"
-            type={showPassword ? 'text' : 'password'}
-            placeholder={'请输入密码'}
+            type={showPassword ? "text" : "password"}
+            placeholder={"请输入密码"}
           >
-            <InputRightElement h={'full'}>
+            <InputRightElement h={"full"}>
               <Button
-                variant={'ghost'}
-                onClick={() =>
-                  setShowPassword((showPassword) => !showPassword)
-                }
+                variant={"ghost"}
+                onClick={() => setShowPassword((showPassword) => !showPassword)}
               >
                 {showPassword ? <ViewIcon /> : <ViewOffIcon />}
               </Button>
@@ -91,15 +74,13 @@ const Account = () => {
           <FormInput
             label="新密码"
             name="password"
-            type={showPassword ? 'text' : 'password'}
-            placeholder={'请输入密码'}
+            type={showPassword ? "text" : "password"}
+            placeholder={"请输入密码"}
           >
-            <InputRightElement h={'full'}>
+            <InputRightElement h={"full"}>
               <Button
-                variant={'ghost'}
-                onClick={() =>
-                  setShowPassword((showPassword) => !showPassword)
-                }
+                variant={"ghost"}
+                onClick={() => setShowPassword((showPassword) => !showPassword)}
               >
                 {showPassword ? <ViewIcon /> : <ViewOffIcon />}
               </Button>
@@ -110,15 +91,13 @@ const Account = () => {
           <FormInput
             label="确认密码"
             name="confirmPassword"
-            type={showPassword ? 'text' : 'password'}
-            placeholder={'请输入密码'}
+            type={showPassword ? "text" : "password"}
+            placeholder={"请输入密码"}
           >
-            <InputRightElement h={'full'}>
+            <InputRightElement h={"full"}>
               <Button
-                variant={'ghost'}
-                onClick={() =>
-                  setShowPassword((showPassword) => !showPassword)
-                }
+                variant={"ghost"}
+                onClick={() => setShowPassword((showPassword) => !showPassword)}
               >
                 {showPassword ? <ViewIcon /> : <ViewOffIcon />}
               </Button>
@@ -127,9 +106,9 @@ const Account = () => {
         </Box>
         <FormSubmitButton
           type="submit"
-          w={'full'}
+          w={"full"}
           isLoading={isLoading}
-          name={'_action'}
+          name={"_action"}
           value={Action.UPDATE_PASSWORD}
           colorScheme="blue"
         >
