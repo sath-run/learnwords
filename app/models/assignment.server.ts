@@ -1,9 +1,8 @@
 import { prisma } from "./prisma.server";
 
-export const addAssignment = async (userId: number, name: string) => {
+export const addAssignment = async (name: string) => {
   return prisma.assignment.create({
     data: {
-      userId,
       name,
     },
   });

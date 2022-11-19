@@ -7,13 +7,15 @@ import {
   Icon,
   Text,
 } from "@chakra-ui/react";
-import { ActionArgs, redirect, SerializeFrom } from "@remix-run/node";
+import { ActionArgs, json, LoaderArgs, redirect } from "@remix-run/node";
 import {
   Form,
   Link as RemixLink,
-  useMatches,
+  useLoaderData,
+  useNavigate,
   useParams,
 } from "@remix-run/react";
+import { useEffect } from "react";
 import { BsQuestion } from "react-icons/bs";
 import { FiCheck, FiX } from "react-icons/fi";
 import invariant from "tiny-invariant";
@@ -21,7 +23,18 @@ import { httpResponse } from "~/http";
 import { AddLog } from "~/models/log.server";
 import { getAssignmentWithTasks } from "~/models/task.server";
 import { requireUserName } from "~/session.server";
-import { loader } from "../$assignmentId";
+
+export const loader = async ({ params }: LoaderArgs) => {
+  let assignmentId = Number(params.assignmentId);
+  if (!assignmentId) {
+    throw httpResponse.BadRequest;
+  }
+  let assignment = await getAssignmentWithTasks(assignmentId);
+  if (!assignment) {
+    throw httpResponse.BadRequest;
+  }
+  return json(assignment);
+};
 
 export const action = async ({ request, params }: ActionArgs) => {
   let { index } = params;
@@ -70,8 +83,20 @@ export const action = async ({ request, params }: ActionArgs) => {
 export default function () {
   const { index, assignmentId } = useParams();
   invariant(index);
-  const assignment = useMatches()[1].data as SerializeFrom<typeof loader>;
+  const assignment = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
   let data = assignment.tasks[Number(index)];
+
+  useEffect(() => {
+    if (!data) {
+      navigate(`/assignment/${assignmentId}/finish`, { replace: true });
+    }
+  }, []);
+
+  if (!data) {
+    return null;
+  }
+
   return (
     <Container
       display={"flex"}

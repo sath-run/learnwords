@@ -1,8 +1,7 @@
 import {
-  Button,
   Box,
+  Button,
   Container,
-  Grid,
   Heading,
   useToast,
   VStack,
@@ -30,7 +29,7 @@ export default function Index() {
   let { assignmentList } = useLoaderData<typeof loader>();
   return (
     <Box h="100%" overflowY="auto">
-      <Container>  
+      <Container>
         <Heading mt={6} mb={2} textAlign={"center"}>
           小朋友，请选择作业
         </Heading>
@@ -49,7 +48,7 @@ export default function Index() {
               colorScheme={"teal"}
               key={assignment.id}
               as={RemixLink}
-              to={`/assignment/${assignment.id}/start`}
+              to={`/assignment/${assignment.id}`}
             >
               {assignment.name}
             </Button>

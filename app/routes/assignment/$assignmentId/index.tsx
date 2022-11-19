@@ -11,14 +11,28 @@ import {
   useToast,
 } from "@chakra-ui/react";
 
-import { ActionArgs, SerializeFrom } from "@remix-run/node";
-import { Form, useMatches } from "@remix-run/react";
+import { ActionArgs, json } from "@remix-run/node";
+import { Form, useLoaderData, useMatches } from "@remix-run/react";
 import { useState } from "react";
 import { BsQuestion } from "react-icons/bs";
 import { FiCheck, FiX } from "react-icons/fi";
 import { httpResponse } from "~/http";
+import { getAssignmentById } from "~/models/assignment.server";
 import { createUserSession } from "~/session.server";
-import { loader } from "../$assignmentId";
+
+export const loader = async ({ params }: ActionArgs) => {
+  let assignmentId = Number(params.assignmentId);
+  if (!assignmentId) {
+    throw httpResponse.BadRequest;
+  }
+  const assignment = await getAssignmentById(assignmentId!);
+
+  if (!assignment) {
+    throw httpResponse.NotFound;
+  }
+
+  return json(assignment);
+};
 
 export const action = async ({ request, params }: ActionArgs) => {
   let formData = await request.formData();
@@ -38,7 +52,7 @@ export default function Index() {
   const [name, setName] = useState("");
   const toast = useToast();
   const matches = useMatches();
-  let assignment = matches[1].data as SerializeFrom<typeof loader>;
+  let assignment = useLoaderData<typeof loader>();
   return (
     <Grid
       h="100%"

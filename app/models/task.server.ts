@@ -52,6 +52,9 @@ export const getAssignmentWithTasks = async (assignmentId: number) => {
       id: true,
       name: true,
       tasks: {
+        where: {
+          isDeleted: false,
+        },
         orderBy: { createdAt: "asc" },
       },
     },

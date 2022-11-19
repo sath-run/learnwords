@@ -18,8 +18,14 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { ActionArgs, redirect, SerializeFrom } from "@remix-run/node";
-import { Form, Link, useMatches, useParams } from "@remix-run/react";
-import { ReactNode, useState } from "react";
+import {
+  Form,
+  Link,
+  useMatches,
+  useNavigate,
+  useParams,
+} from "@remix-run/react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   DragDropContext,
   Draggable,
@@ -34,7 +40,9 @@ import { httpResponse } from "~/http";
 import { AddLog } from "~/models/log.server";
 import { getAssignmentWithTasks } from "~/models/task.server";
 import { requireUserName } from "~/session.server";
-import { loader } from "../$assignmentId";
+import { loader } from "./tasks.$index";
+
+export { loader };
 
 export const action = async ({ request, params }: ActionArgs) => {
   let { index } = params;
@@ -177,6 +185,19 @@ export default function () {
   invariant(index);
   const assignment = useMatches()[1].data as SerializeFrom<typeof loader>;
   let data = assignment.tasks[Number(index)];
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!data) {
+      navigate(`/assignment/${assignmentId}/finish`, { replace: true });
+    }
+  }, []);
+
+  if (!data) {
+    return null;
+  }
+
   let [words, setWords] = useState<string[]>(data.initial);
   let [alts, setAlts] = useState<string[]>(data.alternative);
   let [isDraggingInitial, setIsDraggingInitial] = useState(false);

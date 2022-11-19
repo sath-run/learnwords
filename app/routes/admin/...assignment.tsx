@@ -123,15 +123,15 @@ const Assignment = () => {
                 <Td>
                   <Link
                     isExternal
-                    href={`${origin}/assignment/${assignment.id}/start`}
+                    href={`${origin}/assignment/${assignment.id}`}
                   >
-                    {`${origin}/assignment/${assignment.id}/start`}
+                    {`${origin}/assignment/${assignment.id}`}
                   </Link>
                   <Button
                     colorScheme="teal"
                     variant="ghost"
                     onClick={() =>
-                      onCopy(`${origin}/assignment/${assignment.id}/start`)
+                      onCopy(`${origin}/assignment/${assignment.id}`)
                     }
                     size="sm"
                   >
