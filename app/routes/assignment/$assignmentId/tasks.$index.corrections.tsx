@@ -17,11 +17,11 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { ActionArgs, redirect, SerializeFrom } from "@remix-run/node";
+import { ActionArgs, redirect } from "@remix-run/node";
 import {
   Form,
   Link,
-  useMatches,
+  useLoaderData,
   useNavigate,
   useParams,
 } from "@remix-run/react";
@@ -183,7 +183,7 @@ const ConfirmModal = ({
 export default function () {
   const { index, assignmentId } = useParams();
   invariant(index);
-  const assignment = useMatches()[1].data as SerializeFrom<typeof loader>;
+  const assignment = useLoaderData<typeof loader>();
   let data = assignment.tasks[Number(index)];
 
   const navigate = useNavigate();
