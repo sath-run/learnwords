@@ -39,6 +39,7 @@ model Log {
 model Assignment {
   id        Int      @id @default(autoincrement())
   name      String   @default("")
+  prologue  String   @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
@@ -48,7 +49,8 @@ model Assignment {
 
 model Task {
   id           Int        @id @default(autoincrement())
-  videoUrl     String
+  videoUrl     String      @default("")
+  imageUrl     String      @default("")
   question     String
   example      String
   initial      String[]

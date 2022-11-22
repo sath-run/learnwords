@@ -119,8 +119,8 @@ const newAssignmentAction = async (userId: number, formData: FormData) => {
   if (result.error) {
     return validationError(result.error);
   }
-  const { name } = result.data;
-  await addAssignment(name);
+  const { name, prologue } = result.data;
+  await addAssignment({name,prologue});
   return redirect(`/admin`);
 };
 
@@ -129,13 +129,14 @@ const updateAssignmentAction = async (formData: FormData) => {
     z.object({
       id: z.string().transform((s) => Number(s)),
       name: z.string().min(1, "请填写作业名称"),
+      prologue: z.string().min(1, "请填写作业开场白"),
     })
   ).validate(formData);
   if (result.error) {
     return validationError(result.error);
   }
-  const { name, id } = result.data;
-  await updateAssignment(id, name);
+  const { name, id, prologue } = result.data;
+  await updateAssignment(id, { name, prologue});
   return redirect(`/admin`);
 };
 

@@ -1,21 +1,17 @@
 import { prisma } from "./prisma.server";
 
-export const addAssignment = async (name: string) => {
+export const addAssignment = async (data: {name: string, prologue: string}) => {
   return prisma.assignment.create({
-    data: {
-      name,
-    },
+    data,
   });
 };
 
-export const updateAssignment = async (id: number, name: string) => {
+export const updateAssignment = async (id: number, data: {name: string, prologue: string}) => {
   return prisma.assignment.update({
     where: {
       id,
     },
-    data: {
-      name,
-    },
+    data,
   });
 };
 

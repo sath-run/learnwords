@@ -266,12 +266,12 @@ export default function () {
     >
       <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
         <Heading color="teal.50" px={2} size={"md"} lineHeight="8">
-          你认为
+          {!data.imageUrl && <>你认为
           <Text color={"yellow"} as="strong" fontWeight={"bold"}>
             {data.example}
           </Text>
           不正确
-          <br />
+          <br /></>}
           请你拖一拖小火车，连成一句正确的话
           <br />
           你必须用上"□"里的小火车。
@@ -364,7 +364,7 @@ export default function () {
             <Icon as={ImArrowLeft} mr={2} />
             取消
           </Button>
-          <Button colorScheme={"blue"} size="lg" onClick={modal.onOpen}>
+          <Button colorScheme={"yellow"} size="lg" onClick={modal.onOpen}>
             提交
             <Icon as={ImArrowRight} ml={2} />
           </Button>

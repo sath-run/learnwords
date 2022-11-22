@@ -51,15 +51,16 @@ export const action = async ({ request, params }: ActionArgs) => {
 export default function Index() {
   const [name, setName] = useState("");
   const toast = useToast();
-  const matches = useMatches();
   let assignment = useLoaderData<typeof loader>();
   return (
     <Grid
       h="100%"
       as={Form}
       method="post"
-      py={10}
-      templateRows="80px 1fr 1fr 1fr 120px"
+      py={50}
+      templateRows="1fr 200px 1fr 120px"
+      w={560}
+      mx={'auto'}
       onSubmit={(e) => {
         let nameValue = name.trim();
         if (!nameValue) {
@@ -75,60 +76,62 @@ export default function Index() {
       }}
     >
       <Heading fontFamily={"cursive"} textAlign={"center"}>
-        小朋友你好
-        <br />
-        我们来玩一个小游戏吧！
+        {assignment.prologue ? assignment.prologue : <>
+          小朋友你好
+          <br />
+          我们来玩一个小游戏吧！
+        </>}
       </Heading>
-      <Heading px={4} textAlign="center" as={Center} size="lg">
-        你会看到几个视频
-        <br />
-        请根据视频判断句子是否正确
-      </Heading>
-      <Flex
-        fontSize={"lg"}
-        textAlign={"center"}
-        justifyContent={"space-between"}
-        px={4}
-      >
-        <Box>
-          <Text>正确请按</Text>
-          <Button
-            borderRadius={"3xl"}
-            colorScheme={"green"}
-            mt={2}
-            p={4}
-            h="auto"
-          >
-            <Icon w={8} h={8} as={FiCheck} />
-          </Button>
-        </Box>
-        <Box>
-          <Text>错误请按</Text>
-          <Button
-            borderRadius={"3xl"}
-            colorScheme={"red"}
-            mt={2}
-            p={4}
-            h="auto"
-          >
-            <Icon w={8} h={8} as={FiX} />
-          </Button>
-        </Box>
-        <Box>
-          <Text>不确定请按</Text>
-          <Button
-            borderRadius={"3xl"}
-            colorScheme={"yellow"}
-            mt={2}
-            p={4}
-            h="auto"
-          >
-            <Icon w={8} h={8} as={BsQuestion} />
-          </Button>
-        </Box>
-      </Flex>
+      {/*<Heading px={4} textAlign="center" as={Center} size="lg">*/}
+      {/*  你会看到几个视频*/}
+      {/*  <br />*/}
+      {/*  请根据视频判断句子是否正确*/}
+      {/*</Heading>*/}
+      {/*<Flex*/}
+      {/*  fontSize={"lg"}*/}
+      {/*  textAlign={"center"}*/}
+      {/*  justifyContent={"space-between"}*/}
+      {/*  px={4}*/}
+      {/*>*/}
+      {/*  <Box>*/}
+      {/*    <Text>正确请按</Text>*/}
+      {/*    <Button*/}
+      {/*      borderRadius={"3xl"}*/}
+      {/*      colorScheme={"green"}*/}
+      {/*      mt={2}*/}
+      {/*      p={4}*/}
+      {/*      h="auto"*/}
+      {/*    >*/}
+      {/*      <Icon w={8} h={8} as={FiCheck} />*/}
+      {/*    </Button>*/}
+      {/*  </Box>*/}
+      {/*  <Box>*/}
+      {/*    <Text>错误请按</Text>*/}
+      {/*    <Button*/}
+      {/*      borderRadius={"3xl"}*/}
+      {/*      colorScheme={"red"}*/}
+      {/*      mt={2}*/}
+      {/*      p={4}*/}
+      {/*      h="auto"*/}
+      {/*    >*/}
+      {/*      <Icon w={8} h={8} as={FiX} />*/}
+      {/*    </Button>*/}
+      {/*  </Box>*/}
+      {/*  <Box>*/}
+      {/*    <Text>不确定请按</Text>*/}
+      {/*    <Button*/}
+      {/*      borderRadius={"3xl"}*/}
+      {/*      colorScheme={"yellow"}*/}
+      {/*      mt={2}*/}
+      {/*      p={4}*/}
+      {/*      h="auto"*/}
+      {/*    >*/}
+      {/*      <Icon w={8} h={8} as={BsQuestion} />*/}
+      {/*    </Button>*/}
+      {/*  </Box>*/}
+      {/*</Flex>*/}
 
-      <Center flexDir={"column"}>
+      <Center flexDir={"column"} pt={50}>
         <Heading color={"yellow.200"} textAlign={"center"}>
           {assignment.name}
         </Heading>
@@ -148,7 +151,7 @@ export default function Index() {
       <Box as={Center}>
         <Button
           type="submit"
-          colorScheme={"teal"}
+          colorScheme={"yellow"}
           borderRadius={"full"}
           h="120px"
           w="120px"

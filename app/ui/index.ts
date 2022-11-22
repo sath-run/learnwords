@@ -4,7 +4,6 @@ import FormInput from "./Form/FormInput";
 import FormModal from "./Form/FormModal";
 import FormSubmitButton from "./Form/FormSubmitButton";
 import ModalInput from "./Form/ModalInput";
-import PathInput from "./Form/PathInput";
 
 export {
   FormCancelButton,
@@ -13,5 +12,4 @@ export {
   FormModal,
   FormSubmitButton,
   ModalInput,
-  PathInput,
 };

@@ -1,21 +1,10 @@
-import {
-  ParamType,
-  RequestMethod,
-} from "@prisma/client";
 
-export const JsonNodeType = [
-  ParamType.OBJECT,
-  ParamType.ARRAY,
-  ParamType.STRING,
-  ParamType.FLOAT,
-  ParamType.INT,
-  ParamType.BOOLEAN,
-] as const;
-
-export const RequestMethods = [
-  RequestMethod.GET,
-  RequestMethod.POST,
-  RequestMethod.PUT,
-  RequestMethod.PATCH,
-  RequestMethod.DELETE,
-] as const;
+export interface TaskModel {
+  id: number,
+  videoUrl: string,
+  imageUrl: string,
+  question: string,
+  example: string,
+  initial: string[],
+  alternative: string[]
+}

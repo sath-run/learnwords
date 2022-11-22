@@ -4,6 +4,7 @@ export const addTask = async (data: {
   videoUrl: string;
   question: string;
   example: string;
+  imageUrl: string;
   initial: string[];
   alternative: string[];
   assignmentId: number;
@@ -18,6 +19,7 @@ export const updateTask = async (
   id: number,
   data: {
     videoUrl: string;
+    imageUrl: string;
     question: string;
     example: string;
     initial: string[];

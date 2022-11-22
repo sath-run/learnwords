@@ -27,12 +27,13 @@ import {
   Thead,
   Tooltip,
   Tr,
+  Image,
   useDisclosure,
   useToast,
-} from "@chakra-ui/react";
-import { FocusableElement } from "@chakra-ui/utils";
-import { Assignment } from "@prisma/client";
-import { ActionArgs, json, redirect } from "@remix-run/node";
+} from '@chakra-ui/react';
+import { FocusableElement } from '@chakra-ui/utils';
+import { Assignment } from '@prisma/client';
+import { ActionArgs, json, redirect } from '@remix-run/node';
 import {
   useFetcher,
   useLoaderData,
@@ -40,27 +41,27 @@ import {
   useNavigate,
   useParams,
   useTransition,
-} from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
+} from '@remix-run/react';
+import { withZod } from '@remix-validated-form/with-zod';
 import React, {
   ChangeEvent,
   RefObject,
   useEffect,
   useRef,
   useState,
-} from "react";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
-import { validationError } from "remix-validated-form";
-import z from "zod";
-import { httpResponse } from "~/http";
+} from 'react';
+import { FiEdit, FiTrash2 } from 'react-icons/fi';
+import { validationError } from 'remix-validated-form';
+import z from 'zod';
+import { httpResponse } from '~/http';
 import {
   addTask,
   deleteTask,
   getAssignmentWithTasks,
   updateTask,
-} from "~/models/task.server";
-import { client } from "~/services/aliyun.server";
-import { FormCancelButton, FormInput, FormModal, FormSubmitButton } from "~/ui";
+} from '~/models/task.server';
+import { client } from '~/services/aliyun.server';
+import { FormCancelButton, FormInput, FormModal, FormSubmitButton } from '~/ui';
 
 export const loader = async ({ params }: ActionArgs) => {
   let assignmentId = Number(params.assignmentId);
@@ -75,10 +76,10 @@ export const loader = async ({ params }: ActionArgs) => {
 };
 
 export enum Action {
-  NEW_TASK = "NEW_TASK",
-  UPDATE_TASK = "UPDATE_TASK",
-  DELETE_TASK = "DELETE_TASK",
-  GET_UPLOAD_FILE = "GET_UPLOAD_FILE",
+  NEW_TASK = 'NEW_TASK',
+  UPDATE_TASK = 'UPDATE_TASK',
+  DELETE_TASK = 'DELETE_TASK',
+  GET_UPLOAD_FILE = 'GET_UPLOAD_FILE',
 }
 
 export const action = async ({ request, params }: ActionArgs) => {
@@ -89,7 +90,7 @@ export const action = async ({ request, params }: ActionArgs) => {
     return httpResponse.BadRequest;
   }
 
-  switch (formData.get("_action")) {
+  switch (formData.get('_action')) {
     case Action.GET_UPLOAD_FILE:
       return await getUploadFile(formData);
     case Action.NEW_TASK:
@@ -104,7 +105,7 @@ export const action = async ({ request, params }: ActionArgs) => {
 };
 
 const deleteTaskAction = async (assignmentId: number, formData: FormData) => {
-  let taskId = Number(formData.get("id"));
+  let taskId = Number(formData.get('id'));
   if (!taskId) {
     return httpResponse.BadRequest;
   }
@@ -117,11 +118,12 @@ const updateTaskAction = async (assignmentId: number, formData: FormData) => {
   if (result.error) {
     return validationError(result.error);
   }
-  const { question, example, initial, alternative, videoUrl, id } = result.data;
+  const { question, example, initial, alternative, videoUrl, imageUrl, id } = result.data;
   await updateTask(id, {
     question,
     example,
     videoUrl,
+    imageUrl,
     initial: initial.split(/[^\u4e00-\u9fa5]+/),
     alternative: alternative.split(/[^\u4e00-\u9fa5]+/),
   });
@@ -133,12 +135,13 @@ const newTaskAction = async (assignmentId: number, formData: FormData) => {
   if (result.error) {
     return validationError(result.error);
   }
-  const { question, example, initial, alternative, videoUrl } = result.data;
+  const { question, example, initial, alternative, imageUrl, videoUrl } = result.data;
   await addTask({
     assignmentId,
     question,
     example,
     videoUrl,
+    imageUrl,
     initial: initial.split(/[^\u4e00-\u9fa5]+/),
     alternative: alternative.split(/[^\u4e00-\u9fa5]+/),
   });
@@ -146,14 +149,14 @@ const newTaskAction = async (assignmentId: number, formData: FormData) => {
 };
 
 const getUploadFile = async (formData: FormData) => {
-  const result = client.signatureUrl(`${formData.get("fileName")}`, {
-    method: "PUT",
-    "Content-Type": "multipart/form-data",
+  const result = client.signatureUrl(`${formData.get('fileName')}`, {
+    method: 'PUT',
+    'Content-Type': 'multipart/form-data',
   });
   return json({
     success: true,
     uploadUrl: result,
-    url: client.generateObjectUrl(`${formData.get("fileName")}`),
+    url: client.generateObjectUrl(`${formData.get('fileName')}`),
   });
 };
 
@@ -164,6 +167,7 @@ type TaskModel = {
   initial: string;
   alternative: string;
   videoUrl: string;
+  imageUrl: string;
 };
 
 const Assignment: React.FC = () => {
@@ -174,7 +178,7 @@ const Assignment: React.FC = () => {
   const fetcher = useFetcher();
   const [action, setAction] = useState(Action.NEW_TASK);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
-  const assignmentId = useParams().assignmentId || "";
+  const assignmentId = useParams().assignmentId || '';
   const currentData = useRef<TaskModel>();
   const toast = useToast();
   const navigate = useNavigate();
@@ -183,7 +187,7 @@ const Assignment: React.FC = () => {
     setAction(Action.NEW_TASK);
     taskNewModal.onOpen();
   };
-  const isLoading = fetcher.state !== "idle";
+  const isLoading = fetcher.state !== 'idle';
   const onDelete = () => {
     fetcher.submit(
       {
@@ -191,7 +195,7 @@ const Assignment: React.FC = () => {
         _action: Action.DELETE_TASK,
       },
       {
-        method: "patch",
+        method: 'patch',
         replace: true,
       }
     );
@@ -199,14 +203,14 @@ const Assignment: React.FC = () => {
   const transition = useTransition();
   useEffect(() => {
     if (
-      transition.state === "loading" &&
-      transition.type === "fetchActionRedirect"
+      transition.state === 'loading' &&
+      transition.type === 'fetchActionRedirect'
     ) {
       setDeleteDialogVisible(false);
       toast({
-        title: "操作成功",
-        status: "success",
-        position: "top",
+        title: '操作成功',
+        status: 'success',
+        position: 'top',
         isClosable: true,
       });
     }
@@ -228,7 +232,7 @@ const Assignment: React.FC = () => {
           ))}
         </Select>
         <Spacer />
-        <Button colorScheme={"blue"} onClick={onAdd}>
+        <Button colorScheme={'blue'} onClick={onAdd}>
           新建任务
         </Button>
       </Flex>
@@ -241,6 +245,7 @@ const Assignment: React.FC = () => {
               <Th fontSize={16}>初始答案</Th>
               <Th fontSize={16}>初始词汇</Th>
               <Th fontSize={16}>更多词汇</Th>
+              <Th fontSize={16}>图片文件</Th>
               <Th fontSize={16}>视频文件</Th>
               <Th fontSize={16} isNumeric>
                 更多操作
@@ -253,10 +258,15 @@ const Assignment: React.FC = () => {
                 <Td>{index + 1}</Td>
                 <Td>{task.question}</Td>
                 <Td>{task.example}</Td>
-                <Td>{task.initial.join("，")}</Td>
-                <Td>{task.alternative.join("，")}</Td>
+                <Td>{task.initial.join('，')}</Td>
+                <Td>{task.alternative.join('，')}</Td>
                 <Td>
-                  <Link color={"blue.200"} href={task.videoUrl} isExternal>
+                  {task.imageUrl && <Link color={'blue.200'} href={task.imageUrl} isExternal>
+                    点击查看
+                  </Link>}
+                </Td>
+                <Td>
+                  <Link color={'blue.200'} href={task.videoUrl} isExternal>
                     点击查看
                   </Link>
                 </Td>
@@ -264,13 +274,13 @@ const Assignment: React.FC = () => {
                   <Tooltip label="编辑">
                     <Button
                       size="sm"
-                      colorScheme={"green"}
+                      colorScheme={'green'}
                       mr={5}
                       onClick={() => {
                         currentData.current = {
                           ...task,
-                          initial: task.initial.join("，"),
-                          alternative: task.alternative.join("，"),
+                          initial: task.initial.join('，'),
+                          alternative: task.alternative.join('，'),
                         };
                         taskNewModal.onOpen();
                         setAction(Action.UPDATE_TASK);
@@ -282,13 +292,13 @@ const Assignment: React.FC = () => {
                   <Tooltip label="删除任务">
                     <Button
                       size="sm"
-                      colorScheme={"red"}
+                      colorScheme={'red'}
                       onClick={() => {
                         setDeleteDialogVisible(true);
                         currentData.current = {
                           ...task,
-                          initial: task.initial.join("，"),
-                          alternative: task.alternative.join("，"),
+                          initial: task.initial.join('，'),
+                          alternative: task.alternative.join('，'),
                         };
                       }}
                     >
@@ -360,11 +370,12 @@ const DeleteDialog: React.FC<{
 
 export const newTaskValidator = withZod(
   z.object({
-    question: z.string().min(1, "请填写问题"),
-    example: z.string().min(1, "请填写初始答案"),
-    initial: z.string().min(1, "请填写初始词汇"),
-    alternative: z.string().min(1, "请填写更多词汇"),
-    videoUrl: z.string().min(1, "请上传视频文件"),
+    question: z.string().min(1, '请填写问题'),
+    example: z.string().min(1, '请填写初始答案'),
+    initial: z.string().min(1, '请填写初始词汇'),
+    alternative: z.string().min(1, '请填写更多词汇'),
+    imageUrl:  z.string(),
+    videoUrl: z.string().min(1, '请上传视频文件'),
     id: z.string().transform((s) => Number(s)),
   })
 );
@@ -384,41 +395,44 @@ const NewTaskModal = ({
 }) => {
   const fetcher = useFetcher();
   const uploadFile = useRef<File>();
-  const [videoUrl, setVideoUrl] = useState(defaultValue.videoUrl || "");
-  const [uploading, setUploading] = useState(false);
+  const [videoUrl, setVideoUrl] = useState(defaultValue.videoUrl || '');
+  const [imageUrl, setImageUrl] = useState(defaultValue.imageUrl || '');
+  const [videoUploading, setVideoUploading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
   useEffect(() => {
-    setVideoUrl(defaultValue.videoUrl || "");
-  }, [defaultValue.videoUrl]);
-  const onUploadFile = async (event: ChangeEvent<HTMLInputElement>) => {
+    setImageUrl(defaultValue.imageUrl || '');
+    setVideoUrl(defaultValue.videoUrl || '');
+  }, [defaultValue]);
+  const onUploadFile = async (event: ChangeEvent<HTMLInputElement>, type: string) => {
     const targetEvent = event.target as HTMLInputElement;
     if (targetEvent.files && targetEvent.files.length) {
       uploadFile.current = targetEvent.files[0];
-      setUploading(true);
+      type === 'image' ? setImageUploading(true) : setVideoUploading(true);
       fetcher.submit(
         {
           _action: Action.GET_UPLOAD_FILE,
-          fileName: `${Date.now()}.${targetEvent.files[0].name
-            .split(".")
-            .pop()}`,
+          type: type,
+          fileName: `${Date.now()}.${targetEvent.files[0].name.split('.').pop()}`,
         },
-        { method: "post" }
+        { method: 'post' }
       );
     }
   };
   useEffect(() => {
-    if (fetcher.state === "loading") {
-      const action = fetcher.submission?.formData.get("_action");
+    if (fetcher.state === 'loading') {
+      const action = fetcher.submission?.formData.get('_action');
       switch (action) {
         case Action.GET_UPLOAD_FILE:
           if (fetcher.data.success) {
+            const type = fetcher.submission?.formData.get('type');
             fetch(fetcher.data.uploadUrl, {
-              method: "PUT",
+              method: 'PUT',
               body: uploadFile.current,
-              headers: { "Content-Type": "multipart/form-data" },
+              headers: { 'Content-Type': 'multipart/form-data' },
             }).then((result) => {
-              setUploading(false);
+              type === 'image' ? setImageUploading(false) : setVideoUploading(false);
               if (result.status === 200) {
-                setVideoUrl(fetcher.data.url);
+                type === 'image' ? setImageUrl(fetcher.data.url) : setVideoUrl(fetcher.data.url);
               }
             });
           }
@@ -428,11 +442,12 @@ const NewTaskModal = ({
   }, [fetcher.state]);
   return (
     <FormModal
-      id={"newTaskForm"}
+      id={'newTaskForm'}
       isOpen={isOpen}
       onClose={({ success }) => {
         if (success) {
-          setVideoUrl("");
+          setVideoUrl('');
+          setImageUrl('');
         }
         onClose();
       }}
@@ -447,11 +462,11 @@ const NewTaskModal = ({
 
       <ModalContent>
         <ModalHeader>
-          {action === Action.NEW_TASK ? "新增任务" : "修改任务"}
+          {action === Action.NEW_TASK ? '新增任务' : '修改任务'}
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          <FormInput type={"hidden"} name={"id"} value={defaultValue.id} />
+          <FormInput type={'hidden'} name={'id'} value={defaultValue.id} />
           <FormInput
             mb={5}
             name="question"
@@ -472,9 +487,9 @@ const NewTaskModal = ({
             mb={5}
             name="initial"
             label={
-              <Flex align={"center"}>
+              <Flex align={'center'}>
                 初始词汇
-                <Text fontSize={"sm"} color={"gray"}>
+                <Text fontSize={'sm'} color={'gray'}>
                   (标点符号分割)
                 </Text>
               </Flex>
@@ -487,9 +502,9 @@ const NewTaskModal = ({
             mb={5}
             name="alternative"
             label={
-              <Flex align={"center"}>
+              <Flex align={'center'}>
                 更多词汇
-                <Text fontSize={"sm"} color={"gray"}>
+                <Text fontSize={'sm'} color={'gray'}>
                   (标点符号分割)
                 </Text>
               </Flex>
@@ -500,7 +515,39 @@ const NewTaskModal = ({
           />
           <FormInput
             mb={5}
-            type={"hidden"}
+            type={'hidden'}
+            name="imageUrl"
+            label="图片"
+            placeholder="请上传图片"
+            autoComplete="off"
+            value={imageUrl}
+          >
+            <Box mb={5}>
+              {imageUrl && <Image w={'200px'} src={imageUrl} alt={'图片'} />}
+              <Button
+                mt={2}
+                isLoading={imageUploading}
+                colorScheme={'blue'}
+                position={'relative'}
+              >
+                <Input
+                  position={'absolute'}
+                  left={0}
+                  right={0}
+                  top={0}
+                  bottom={0}
+                  type={'file'}
+                  opacity={0}
+                  onChange={e => onUploadFile(e, 'image')}
+                  accept={'image/*'}
+                />
+                选择图片
+              </Button>
+            </Box>
+          </FormInput>
+          <FormInput
+            mb={5}
+            type={'hidden'}
             name="videoUrl"
             label="视频文件	"
             placeholder="请上传视频文件"
@@ -510,23 +557,23 @@ const NewTaskModal = ({
             <Box>
               {videoUrl && <video width={200} src={videoUrl} controls />}
               <Button
-                isLoading={uploading}
+                isLoading={videoUploading}
                 mt={2}
-                colorScheme={"blue"}
-                position={"relative"}
+                colorScheme={'blue'}
+                position={'relative'}
               >
                 <Input
-                  position={"absolute"}
+                  position={'absolute'}
                   left={0}
                   right={0}
                   top={0}
                   bottom={0}
-                  type={"file"}
+                  type={'file'}
                   opacity={0}
-                  onChange={onUploadFile}
-                  accept={".mp4"}
+                  onChange={e => onUploadFile(e, 'video')}
+                  accept={'video/*'}
                 />
-                选择文件
+                选择视频
               </Button>
             </Box>
           </FormInput>

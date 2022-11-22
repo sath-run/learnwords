@@ -7,7 +7,6 @@ import {
   AlertDialogOverlay,
   Button,
   Flex,
-  Icon,
   Link,
   ModalBody,
   ModalCloseButton,
@@ -24,20 +23,21 @@ import {
   Thead,
   Tooltip,
   Tr,
+  Textarea,
   useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
-import { FocusableElement } from "@chakra-ui/utils";
-import { Assignment as PrismaAssignment } from "@prisma/client";
-import { useFetcher, useLoaderData } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import React, { RefObject, useEffect, useRef, useState } from "react";
-import { FiCopy, FiEdit, FiShare, FiTrash2 } from "react-icons/fi";
-import z from "zod";
-import { Action, loader } from "~/routes/admin";
-import { FormCancelButton, FormInput, FormModal, FormSubmitButton } from "~/ui";
+  useToast, Icon
+} from '@chakra-ui/react';
+import { FocusableElement } from '@chakra-ui/utils';
+import { Assignment as PrismaAssignment } from '@prisma/client';
+import { withZod } from '@remix-validated-form/with-zod';
+import React, { RefObject, useEffect, useRef, useState } from 'react';
+import { FiCopy, FiEdit, FiShare, FiTrash2 } from 'react-icons/fi';
+import z from 'zod';
+import { Action, loader } from '~/routes/admin';
+import { FormCancelButton, FormInput, FormModal, FormSubmitButton } from '~/ui';
+import { useFetcher, useLoaderData } from '@remix-run/react';
 
-type Assignment = Omit<PrismaAssignment, "createdAt" | "updatedAt">;
+type Assignment = Omit<PrismaAssignment, 'createdAt' | 'updatedAt'>;
 
 const Assignment = () => {
   const { assignments, origin: initialOrigin } = useLoaderData<typeof loader>();
@@ -56,7 +56,7 @@ const Assignment = () => {
   }, []);
 
   useEffect(() => {
-    if (fetcher.type === "done") {
+    if (fetcher.type === 'done') {
       setDeleteDialogVisible(false);
     }
   }, [fetcher.type]);
@@ -65,7 +65,7 @@ const Assignment = () => {
     setAction(Action.NEW_ASSIGNMENT);
     assignmentNewModal.onOpen();
   };
-  const isLoading = fetcher.state !== "idle";
+  const isLoading = fetcher.state !== 'idle';
   const onDelete = () => {
     fetcher.submit(
       {
@@ -73,42 +73,43 @@ const Assignment = () => {
         _action: Action.DELETE_ASSIGNMENT,
       },
       {
-        method: "patch",
+        method: 'patch',
         replace: true,
       }
     );
   };
   const onCopy = (text: string) => {
-    const input = document.createElement("input");
+    const input = document.createElement('input');
     document.body.appendChild(input);
     input.value = text;
     input.select();
-    document.execCommand("copy");
+    document.execCommand('copy');
     input.remove();
     toast({
-      title: "复制成功",
-      status: "success",
-      position: "top",
+      title: '复制成功',
+      status: 'success',
+      position: 'top',
       isClosable: true,
     });
   };
   const onExport = (id: number) => {
-    window.open(`/admin/${id}/download`, "_black");
+    window.open(`/admin/${id}/download`, '_black');
   };
   return (
     <>
       <Flex>
         <Spacer />
-        <Button colorScheme={"blue"} onClick={onAdd}>
+        <Button colorScheme={'blue'} onClick={onAdd}>
           新建作业
         </Button>
       </Flex>
       <TableContainer mt={4}>
-        <Table variant="simple" width={"100%"}>
+        <Table variant="simple" width={'100%'}>
           <Thead>
             <Tr>
               <Th fontSize={16}>序号</Th>
               <Th fontSize={16}>作业名称</Th>
+              <Th fontSize={16}>作业开场白</Th>
               <Th fontSize={16}>作业链接</Th>
               <Th fontSize={16} isNumeric>
                 更多操作
@@ -118,8 +119,13 @@ const Assignment = () => {
           <Tbody>
             {assignments.map((assignment, index) => (
               <Tr key={assignment.id}>
-                <Td align={"center"}>{index + 1}</Td>
+                <Td align={'center'}>{index + 1}</Td>
                 <Td>{assignment.name}</Td>
+                <Td>
+                  <Tooltip label={assignment.prologue}>
+                    <Button colorScheme="teal" variant="link">查看</Button>
+                  </Tooltip>
+                </Td>
                 <Td>
                   <Link
                     isExternal
@@ -143,7 +149,7 @@ const Assignment = () => {
                     <Button
                       size="sm"
                       mr={5}
-                      colorScheme={"green"}
+                      colorScheme={'green'}
                       onClick={() => onExport(assignment.id)}
                     >
                       <FiShare />
@@ -151,7 +157,7 @@ const Assignment = () => {
                   </Tooltip>
                   <Tooltip label="编辑">
                     <Button
-                      colorScheme={"green"}
+                      colorScheme={'green'}
                       mr={5}
                       size="sm"
                       onClick={() => {
@@ -166,7 +172,7 @@ const Assignment = () => {
                   <Tooltip label="删除作业">
                     <Button
                       size="sm"
-                      colorScheme={"red"}
+                      colorScheme={'red'}
                       onClick={() => {
                         setDeleteDialogVisible(true);
                         currentData.current = assignment;
@@ -239,7 +245,8 @@ const DeleteDialog: React.FC<{
 
 export const newAssignmentValidator = withZod(
   z.object({
-    name: z.string().min(1, "请填写作业名称"),
+    name: z.string().min(1, '请填写作业名称'),
+    prologue: z.string().min(1, '请填写作业开场白'),
   })
 );
 
@@ -263,23 +270,33 @@ const NewAssignmentModal = ({
       method="post"
       size="lg"
       resetAfterSubmit={true}
-      action={"/admin"}
+      action={'/admin'}
     >
       <ModalOverlay />
 
       <ModalContent>
         <ModalHeader>
-          {action === Action.NEW_ASSIGNMENT ? "新增作业" : "修改作业"}
+          {action === Action.NEW_ASSIGNMENT ? '新增作业' : '修改作业'}
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          <FormInput type={"hidden"} name={"id"} value={defaultValue.id} />
+          <FormInput type={'hidden'} name={'id'} value={defaultValue.id} />
           <FormInput
             name="name"
+            mb={5}
             label="作业名称"
             placeholder="请填写作业名称"
             autoComplete="off"
             defaultValue={defaultValue.name}
+          />
+          <FormInput
+            name="prologue"
+            label="作业开场白"
+            as={Textarea}
+            rows={8}
+            placeholder="请填写作业开场白"
+            autoComplete="off"
+            defaultValue={defaultValue.prologue}
           />
         </ModalBody>
 
