@@ -87,8 +87,6 @@ export default function () {
   const assignment = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   let data = assignment.tasks[Number(index)];
-  const taskType = !data.imageUrl ? 1 : 2;
-  console.info(':taskType:', taskType);
   useEffect(() => {
     if (!data) {
       navigate(`/assignment/${assignmentId}/finish`, { replace: true });
@@ -107,11 +105,10 @@ export default function () {
       textAlign={'center'}
       alignItems="center"
       px={0}
-      py={16}
-      h="full"
-      width={560}
+      py={10}
+      maxW={800}
     >
-      {taskType === 1 ? <NormalMode {...data} /> : <ImageMode {...data} />}
+      {!data.imageUrl ? <NormalMode {...data} /> : <ImageMode {...data} />}
     </Container>
   );
 }
@@ -127,8 +124,8 @@ const NormalMode = (data: TaskModel) => {
       </video>
     </Flex>
 
-    <Box>
-      <Heading size="md" mb={4}>
+    <Box mt={10}>
+      <Heading size="md" mb={5}>
         请根据视频判断以下句子是否正确
       </Heading>
       <Text
@@ -150,6 +147,7 @@ const NormalMode = (data: TaskModel) => {
       textAlign={'center'}
       justifyContent={'space-between'}
       px={4}
+      py={5}
       w="360px"
       color={'blue.500'}
       as={Form}
@@ -210,30 +208,16 @@ const NormalMode = (data: TaskModel) => {
 
 const ImageMode = (data: TaskModel) => {
   const { index, assignmentId } = useParams();
-  const [step, setStep] = useState(0);
   return (
-    <Box>
-      {step === 0 ? <Center flexDir={'column'} pt={50}>
-        <Heading size="md" mb={4}>
+      <Center flexDir={'column'}>
+        <Heading size="md" mb={4} lineHeight={1.5}>
           请看下面的图片，图片里的人或物品会出现在接下来的视频中。
         </Heading>
-        <Image mt={10} borderRadius={5} w={'100%'} src={data.imageUrl} />
-        <Button
-          mt={10}
-          borderRadius={'3xl'}
-          colorScheme={'yellow'}
-          w={300}
-          p={4}
-          h="auto"
-          onClick={() => setStep(1)}
-        >
-          下一步
-        </Button>
-      </Center> : <Center flexDir={'column'} pt={50}>
-        <Heading size="md" mt={4}>
-          <Center>请看视频，注意看 <Text color={'yellow'} fontSize={'2xl'}>{data.question}</Text></Center>
+        <Image mt={3} borderRadius={5} w={'100%'} src={data.imageUrl} />
+        <Heading size="md" mt={20}>
+          <Center>请看视频，注意看  <Text color={"yellow"} as="strong" fontWeight={"bold"}>{data.question}</Text></Center>
         </Heading>
-        <Box mt={10}>
+        <Box mt={5}>
           <video width="100%" height={'auto'} controls autoPlay loop>
             <source src={data.videoUrl} type="video/mp4" />
           </video>
@@ -251,7 +235,5 @@ const ImageMode = (data: TaskModel) => {
           开始做题
         </Button>
       </Center>
-      }
-
-    </Box>);
+    );
 };

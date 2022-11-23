@@ -35,6 +35,7 @@ export default function Index() {
         </Heading>
         <VStack
           borderRadius={"lg"}
+          mt={5}
           p={4}
           bg={"whiteAlpha.500"}
           overflow-y={"auto"}

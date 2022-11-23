@@ -137,10 +137,10 @@ const ConfirmModal = ({
   words: string[];
 }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} isCentered={true} size={'sm'}>
       <Form method="post">
         <ModalOverlay />
-        <ModalContent bg="gray.800" color={"white"}>
+        <ModalContent bg="gray.800" color={"white"} w={'90vw'}>
           <ModalHeader fontFamily={"cursive"}>
             小朋友，请确认你的答案
           </ModalHeader>
@@ -262,7 +262,7 @@ export default function () {
       alignItems="center"
       px={2}
       py={16}
-      h="100%"
+      minH="100%"
     >
       <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
         <Heading color="teal.50" px={2} size={"md"} lineHeight="8">

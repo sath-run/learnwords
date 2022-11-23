@@ -25,7 +25,7 @@ import {
   Tr,
   Textarea,
   useDisclosure,
-  useToast, Icon
+  useToast, Icon, Checkbox, RadioGroup, Stack, Radio, FormLabel
 } from '@chakra-ui/react';
 import { FocusableElement } from '@chakra-ui/utils';
 import { Assignment as PrismaAssignment } from '@prisma/client';
@@ -246,6 +246,7 @@ const DeleteDialog: React.FC<{
 export const newAssignmentValidator = withZod(
   z.object({
     name: z.string().min(1, '请填写作业名称'),
+    isShowTip: z.string(),
     prologue: z.string().min(1, '请填写作业开场白'),
   })
 );
@@ -289,6 +290,13 @@ const NewAssignmentModal = ({
             autoComplete="off"
             defaultValue={defaultValue.name}
           />
+          <FormLabel>答案操作提示</FormLabel>
+          <RadioGroup mb={5} name={'isShowTip'} defaultValue={defaultValue.isShowTip ? 'on' : 'off'}>
+            <Stack direction='row'>
+              <Radio value='on'>显示</Radio>
+              <Radio value='off'>隐藏</Radio>
+            </Stack>
+          </RadioGroup>
           <FormInput
             name="prologue"
             label="作业开场白"

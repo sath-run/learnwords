@@ -4,7 +4,7 @@ import { Outlet } from '@remix-run/react';
 
 export default function Index() {
   return (
-    <Container h="full" w="full" overflowY={'auto'} maxW={'100%'}>
+    <Container h="full" overflowY={'auto'} overflowX={'hidden'}>
       <Outlet />
     </Container>
   );
