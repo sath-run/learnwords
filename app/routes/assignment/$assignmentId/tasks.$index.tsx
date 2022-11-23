@@ -208,32 +208,47 @@ const NormalMode = (data: TaskModel) => {
 
 const ImageMode = (data: TaskModel) => {
   const { index, assignmentId } = useParams();
+  const [step, setStep] = useState(0)
   return (
-      <Center flexDir={'column'}>
-        <Heading size="md" mb={4} lineHeight={1.5}>
-          请看下面的图片，图片里的人或物品会出现在接下来的视频中。
-        </Heading>
-        <Image mt={3} borderRadius={5} w={'100%'} src={data.imageUrl} />
-        <Heading size="md" mt={20}>
-          <Center>请看视频，注意看  <Text color={"yellow"} as="strong" fontWeight={"bold"}>{data.question}</Text></Center>
-        </Heading>
-        <Box mt={5}>
-          <video width="100%" height={'auto'} controls autoPlay loop>
-            <source src={data.videoUrl} type="video/mp4" />
-          </video>
-        </Box>
-        <Button
-          mt={10}
-          borderRadius={'3xl'}
-          colorScheme={'yellow'}
-          w={300}
-          p={4}
-          h="auto"
-          as={RemixLink}
-          to={`/assignment/${assignmentId}/tasks/${index}/corrections`}
-        >
-          开始做题
-        </Button>
+      <Center flexDir={'column'} pt={30} >
+        {step === 0 ? <>
+          <Heading size="md" mb={4} lineHeight={1.5}>
+            请看下面的图片，图片里的人或物品会出现在接下来的视频中。
+          </Heading>
+          <Image mt={5} borderRadius={5} w={'100%'} src={data.imageUrl} />
+          <Button
+            mt={20}
+            borderRadius={'3xl'}
+            colorScheme={'yellow'}
+            w={300}
+            p={4}
+            h="auto"
+            onClick={() => setStep(1)}
+          >
+            下一步
+          </Button>
+        </> : <>
+          <Heading size="md" pt={30}>
+            <Center>请看视频，注意看  <Text color={"yellow"} as="strong" fontWeight={"bold"}>{data.question}</Text></Center>
+          </Heading>
+          <Box mt={5}>
+            <video width="100%" height={'auto'} controls autoPlay loop>
+              <source src={data.videoUrl} type="video/mp4" />
+            </video>
+          </Box>
+          <Button
+            mt={20}
+            borderRadius={'3xl'}
+            colorScheme={'yellow'}
+            w={300}
+            p={4}
+            h="auto"
+            as={RemixLink}
+            to={`/assignment/${assignmentId}/tasks/${index}/corrections`}
+          >
+            开始做题
+          </Button>
+        </>}
       </Center>
     );
 };

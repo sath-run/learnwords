@@ -51,6 +51,7 @@ export default function Index() {
   const [name, setName] = useState("");
   const toast = useToast();
   let assignment = useLoaderData<typeof loader>();
+  const prologueStrList = assignment.prologue.split(/\r|\n/);
   return (
     <Grid
       h="100%"
@@ -73,7 +74,12 @@ export default function Index() {
       }}
     >
       <Heading mb={5} fontFamily={"cursive"} textAlign={"center"}>
-        {assignment.prologue ? assignment.prologue : <>
+        {assignment.prologue ? prologueStrList.map(prologue => {
+          if(!prologue){
+            return <br/>
+          }
+          return <>{prologue}<br/></>
+        }) : <>
           小朋友你好
           <br />
           我们来玩一个小游戏吧！
