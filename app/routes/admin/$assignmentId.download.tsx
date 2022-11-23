@@ -47,7 +47,7 @@ const getLogsCSV = async (assignmentId: number) => {
   let actionMap: { [key in string]: string } = {
     correct: "正确",
     unsure: "不确定",
-    rephrase: "不正确",
+    rephrase: "造句",
   };
   rows = rows.concat(
     logs.map((log) => {
